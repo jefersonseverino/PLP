@@ -37,7 +37,6 @@ ValorTimezone ::= ValorString
 ExpUnaria ::= “-“ Expressao
        | “not” Expressao
        | “length” Expressao
-       | Expressao "in" Expressao // Convert timezone
 
 ExpBinaria ::= Expressao “+” Expressao
        | Expressao “-“ Expressao
@@ -52,6 +51,7 @@ ExpBinaria ::= Expressao “+” Expressao
        | Expressao "<=" Expressao //
        | Expressao "*" Expressao // 
        | Expressao "/" Expressao //
+       | Expressao "in" ValorTimezone // Convert timezone
 
 ComandoDeclaracao ::= “{“ Declaracao “;” Comando “}”
 
