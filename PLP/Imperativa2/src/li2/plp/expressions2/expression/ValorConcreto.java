@@ -42,6 +42,13 @@ public abstract class ValorConcreto<T> implements Valor {
 
 	}
 
+	public boolean isMenor(ValorConcreto<T> obj) {
+		String left = String.valueOf(this.valor());
+		String right = String.valueOf(obj.valor());
+
+		return left.compareTo(right) < 0;
+	}
+
 	/**
 	 * Retorna o valor deste valor primitivo, i.e, ele mesmo.
 	 */

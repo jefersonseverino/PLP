@@ -634,23 +634,24 @@ Expressao PExpBinaria() :
 			retorno = PExpEquals()
 		| LOOKAHEAD (PExpPrimaria() <PLUS>)
 			retorno = PExpSoma()
-
 		|  LOOKAHEAD (PExpPrimaria() <LT>)
 			retorno = PExpLT()
 		|  LOOKAHEAD (PExpPrimaria() <GT>)
 			retorno = PExpGT()
-		|  LOOKAHEAD (PExpPrimaria() <NE>)
-			retorno = PExpNE()
+/*
 		|  LOOKAHEAD (PExpPrimaria() <GE>)
 			retorno = PExpGE()
 		|  LOOKAHEAD (PExpPrimaria() <LE>)
 			retorno = PExpLE()
+		|  LOOKAHEAD (PExpPrimaria() <NE>)
+			retorno = PExpNE()
 		|  LOOKAHEAD (PExpPrimaria() <STAR>)
 			retorno = PExpStar()
 		|  LOOKAHEAD (PExpPrimaria() <SLASH>)
 			retorno = PExpSlash()
 		|   LOOKAHEAD (PExpPrimaria() <IN>)
 			retorno = PExpIN()
+*/
 
 	)
 	{
@@ -733,7 +734,6 @@ ExpConcat PExpConcat() :
 	{return new ExpConcat(esq, dir);}
 }
 
-/*
 ExpLT PExpLT() :
 {
 	Expressao esq;
@@ -758,18 +758,7 @@ ExpGT PExpGT() :
 	{return new ExpGT(esq, dir);}
 }
 
-ExpNE PExpNE() :
-{
-	Expressao esq;
-	Expressao dir;
-}
-{
-	esq = PExpPrimaria()
-	<NE>
-	dir = PExpressao()
-	{return new ExpNE(esq, dir);}
-}
-
+/*
 ExpGE PExpGE() :
 {
 	Expressao esq;
@@ -793,6 +782,20 @@ ExpLE PExpLE() :
 	dir = PExpressao()
 	{return new ExpLE(esq, dir);}
 }
+
+
+ExpNE PExpNE() :
+{
+	Expressao esq;
+	Expressao dir;
+}
+{
+	esq = PExpPrimaria()
+	<NE>
+	dir = PExpressao()
+	{return new ExpNE(esq, dir);}
+}
+
 
 
 ExpStar PExpStar() :
@@ -841,7 +844,7 @@ Expressao PExpressao() :
 	    LOOKAHEAD (2) 
 	  		retorno = PExpUnaria()
 	  | LOOKAHEAD (PExpPrimaria() (<OR> | <AND> | <MINUS> | <PLUS> | <EQ> | <CONCAT> | <LT> 
-	  							   | <GT> | <NE> | <GE> | <LE> | <STAR> | <SLASH>)) 
+	  							   | <GT> | <GE> | <LE> | <NE> | <STAR> | <SLASH>)) 
 	  		retorno = PExpBinaria()
 	  |
 	    retorno = PExpPrimaria()
