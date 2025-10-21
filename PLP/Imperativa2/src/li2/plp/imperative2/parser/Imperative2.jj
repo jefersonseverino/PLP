@@ -251,6 +251,7 @@ TOKEN : /* OPERATORS */
 | < BIT_OR: "|" >
 | < XOR: "^" >
 | < REM: "%" >
+| < IN: "in" >
 }
 
 Programa Input() :
@@ -429,6 +430,108 @@ Valor PValorString() :
 	}
 }
 
+/*
+Valor PValorTimeStamp():
+{
+    Token ano;
+    Token mes;
+    Token dia;
+    Token hora;
+    Token minuto;
+    Token segundo;
+	Token tz_str = null;
+    Token tz_sinal = null;
+    Token tz_hora = null;
+    Token tz_minuto = null;
+}
+{
+    "@" 
+    ano = <INTEGER_LITERAL> "-" 
+    mes = <INTEGER_LITERAL> "-" 
+    dia = <INTEGER_LITERAL> 
+    "T" 
+    hora = <INTEGER_LITERAL> ":" 
+    minuto = <INTEGER_LITERAL> ":" 
+    segundo = <INTEGER_LITERAL>
+    [
+        (
+            tz_str = <STRING_LITERAL>
+            |
+            (tz_sinal = <PLUS> | tz_sinal = <MINUS>)
+            tz_hora = <INTEGER_LITERAL> ":" tz_minuto = <INTEGER_LITERAL>
+        )
+    ]
+	{
+        int a = Integer.parseInt(ano.toString());
+        int m = Integer.parseInt(mes.toString());
+        int d = Integer.parseInt(dia.toString());
+        int h = Integer.parseInt(hora.toString());
+        int min = Integer.parseInt(minuto.toString());
+        int s = Integer.parseInt(segundo.toString());
+        
+        String timezone = null;
+        if (tz_sinal != null) {
+            timezone = tz_sinal.toString() + tz_hora.toString() + ":" + tz_minuto.toString();
+        }
+
+        return new ValorTimestamp(a, m, d, h, min, s, timezone);
+	}
+}
+
+
+Valor PValorDuration():
+{
+    Token hora;
+    Token minuto = null;
+    Token segundo = null;
+}
+{
+    hora = <INTEGER_LITERAL> "h"
+    [ minuto = <INTEGER_LITERAL> "m" [ segundo = <INTEGER_LITERAL> "s" ] ]
+    {
+        int h = Integer.parseInt(hora.image);
+        Integer m = null;
+        Integer s = null;
+
+        if (minuto != null) {
+            m = Integer.parseInt(minuto.image);
+        }
+
+        if (segundo != null) {
+            s = Integer.parseInt(segundo.image);
+        }
+
+        return new ValorDuration(h, m, s);
+    }
+}
+
+Valor PValorTimezone():
+{
+    Token sinal = null;
+    Token horas = null;
+    Token minutos = null;
+    Token texto = null;
+}
+{
+    (
+        texto = <STRING_LITERAL>
+        {
+            return new ValorTimezone(texto.image);
+        }
+    |
+        sinal = (<PLUS> | <MINUS>)
+        horas = <INTEGER_LITERAL> ":" minutos = <INTEGER_LITERAL>
+        {
+            int h = Integer.parseInt(horas.image);
+            int m = Integer.parseInt(minutos.image);
+            boolean positivo = sinal.kind == PLUS;  // true se for '+'
+
+            return new ValorTimezone(positivo, h, m);
+        }
+    )
+}
+*/
+
 Valor PValor() :
 {
 	Valor retorno;
@@ -438,6 +541,8 @@ Valor PValor() :
       	  retorno = PValorInteiro() 
 		| retorno = PValorBooleano()
 		| retorno = PValorString()
+		// | retorno = PValorTimeStamp()
+		// | retorno = PValorDuration()
     )
 	
 	{
@@ -529,6 +634,24 @@ Expressao PExpBinaria() :
 			retorno = PExpEquals()
 		| LOOKAHEAD (PExpPrimaria() <PLUS>)
 			retorno = PExpSoma()
+
+		|  LOOKAHEAD (PExpPrimaria() <LT>)
+			retorno = PExpLT()
+		|  LOOKAHEAD (PExpPrimaria() <GT>)
+			retorno = PExpGT()
+		|  LOOKAHEAD (PExpPrimaria() <NE>)
+			retorno = PExpNE()
+		|  LOOKAHEAD (PExpPrimaria() <GE>)
+			retorno = PExpGE()
+		|  LOOKAHEAD (PExpPrimaria() <LE>)
+			retorno = PExpLE()
+		|  LOOKAHEAD (PExpPrimaria() <STAR>)
+			retorno = PExpStar()
+		|  LOOKAHEAD (PExpPrimaria() <SLASH>)
+			retorno = PExpSlash()
+		|   LOOKAHEAD (PExpPrimaria() <IN>)
+			retorno = PExpIN()
+
 	)
 	{
 		return retorno;
@@ -610,6 +733,105 @@ ExpConcat PExpConcat() :
 	{return new ExpConcat(esq, dir);}
 }
 
+/*
+ExpLT PExpLT() :
+{
+	Expressao esq;
+	Expressao dir;
+}
+{
+	esq = PExpPrimaria()
+	<LT>
+	dir = PExpressao()
+	{return new ExpLT(esq, dir);}
+}
+
+ExpGT PExpGT() :
+{
+	Expressao esq;
+	Expressao dir;
+}
+{
+	esq = PExpPrimaria()
+	<GT>
+	dir = PExpressao()
+	{return new ExpGT(esq, dir);}
+}
+
+ExpNE PExpNE() :
+{
+	Expressao esq;
+	Expressao dir;
+}
+{
+	esq = PExpPrimaria()
+	<NE>
+	dir = PExpressao()
+	{return new ExpNE(esq, dir);}
+}
+
+ExpGE PExpGE() :
+{
+	Expressao esq;
+	Expressao dir;
+}
+{
+	esq = PExpPrimaria()
+	<GE>
+	dir = PExpressao()
+	{return new ExpGE(esq, dir);}
+}
+
+ExpLE PExpLE() :
+{
+	Expressao esq;
+	Expressao dir;
+}
+{
+	esq = PExpPrimaria()
+	<LE>
+	dir = PExpressao()
+	{return new ExpLE(esq, dir);}
+}
+
+
+ExpStar PExpStar() :
+{
+	Expressao esq;
+	Expressao dir;
+}
+{
+	esq = PExpPrimaria()
+	<STAR>
+	dir = PExpressao()
+	{return new ExpStar(esq, dir);}
+}
+
+ExpSlash PExpSlash() :
+{
+	Expressao esq;
+	Expressao dir;
+}
+{
+	esq = PExpPrimaria()
+	<SLASH>
+	dir = PExpressao()
+	{return new ExpSlash(esq, dir);}
+}
+
+ExpIN PExpIN() :
+{
+	Expressao esq;
+	ValorTimezone dir;
+}
+{
+	esq = PExpPrimaria()
+	<IN>
+	dir = PValorTimezone()
+	{return new ExpIN(esq, dir);}
+}
+*/
+
 Expressao PExpressao() :
 {
 	Expressao retorno;
@@ -618,7 +840,8 @@ Expressao PExpressao() :
 	(
 	    LOOKAHEAD (2) 
 	  		retorno = PExpUnaria()
-	  | LOOKAHEAD (PExpPrimaria() (<OR> | <AND> | <MINUS> | <PLUS> | <EQ> | <CONCAT>)) 
+	  | LOOKAHEAD (PExpPrimaria() (<OR> | <AND> | <MINUS> | <PLUS> | <EQ> | <CONCAT> | <LT> 
+	  							   | <GT> | <NE> | <GE> | <LE> | <STAR> | <SLASH>)) 
 	  		retorno = PExpBinaria()
 	  |
 	    retorno = PExpPrimaria()
