@@ -16,18 +16,18 @@ Skip ::=
 Atribuicao ::= Id “:=” Expressao
 
 Expressao ::= Valor
-       | ExpUnaria | ExpBinaria | Id | Expressao "." Id // Acess properties
+       | ExpUnaria | ExpBinaria | Id | Expressao "." Id
 
 Valor ::= ValorConcreto
 
 ValorConcreto ::= ValorInteiro
        | ValorBooleano
        | ValorString
-       | ValorTimestamp //
-       | ValorDuration //
+       | ValorTimestamp
+       | ValorDuration
 
 ValorTimestamp ::= "@" ValorInteiro "-" ValorInteiro "-" ValorInteiro
-                    "T" ValorInteiro ":" ValorInteiro ":" ValorInteiro [ ValorTimezone ] // 
+                    "T" ValorInteiro ":" ValorInteiro ":" ValorInteiro [ ValorTimezone ] 
 
 ValorDuration ::= ValorInteiro "h" [ ValorInteiro "m" [ ValorInteiro "s" ] ]
 
@@ -44,14 +44,14 @@ ExpBinaria ::= Expressao “+” Expressao
        | Expressao “or” Expressao
        | Expressao “==” Expressao
        | Expressao “++” Expressao
-       | Expressao "<" Expressao // 
-       | Expressao ">" Expressao // 
-       | Expressao "!=" Expressao // 
-       | Expressao ">=" Expressao // 
-       | Expressao "<=" Expressao //
-       | Expressao "*" Expressao // 
-       | Expressao "/" Expressao //
-       | Expressao "in" ValorTimezone // Convert timezone
+       | Expressao "<" Expressao 
+       | Expressao ">" Expressao  
+       | Expressao "!=" Expressao  
+       | Expressao ">=" Expressao  
+       | Expressao "<=" Expressao 
+       | Expressao "*" Expressao  
+       | Expressao "/" Expressao 
+       | Expressao "in" ValorTimezone
 
 ComandoDeclaracao ::= “{“ Declaracao “;” Comando “}”
 
