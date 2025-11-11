@@ -20,7 +20,7 @@ public class ValorString extends ValorConcreto<String> {
 	 * Retorna os tipos possiveis desta expressao.
 	 * 
 	 * @param amb
-	 *            o ambiente de compila��o.
+	 *            o ambiente de compilação.
 	 * @return os tipos possiveis desta expressao.
 	 */
 	public Tipo getTipo(AmbienteCompilacao amb) {

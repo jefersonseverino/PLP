@@ -430,7 +430,6 @@ Valor PValorString() :
 	}
 }
 
-
 Valor PValorTimeStamp():
 {
     Token ano;
@@ -449,7 +448,7 @@ Valor PValorTimeStamp():
     ano = <INTEGER_LITERAL> "-" 
     mes = <INTEGER_LITERAL> "-" 
     dia = <INTEGER_LITERAL> 
-    "@" 
+    "T" 
     hora = <INTEGER_LITERAL> ":" 
     minuto = <INTEGER_LITERAL> ":" 
     segundo = <INTEGER_LITERAL>
@@ -468,24 +467,16 @@ Valor PValorTimeStamp():
         int h = Integer.parseInt(hora.toString());
         int min = Integer.parseInt(minuto.toString());
         int s = Integer.parseInt(segundo.toString());
+        
+        String timezone = null;
+        if (tz_sinal != null) {
+            timezone = tz_sinal.toString() + tz_hora.toString() + ":" + tz_minuto.toString();
+        }
 
-		if (tz_str != null) {
-			String timezoneStr = tz_str.toString();
-			return new ValorTimestamp(a, m, d, h, min, s, timezoneStr);
-		}
-
-		if (tz_sinal != null) {
-			String timezoneSignal = tz_sinal.toString();
-			int timezoneHour = Integer.parseInt(tz_hora.toString());
-			int timezoneMinute = Integer.parseInt(tz_minuto.toString());
-			return new ValorTimestamp(a, m, d, h, min, s, timezoneSignal, timezoneHour, timezoneMinute);
-		}
-
-        return new ValorTimestamp(a, m, d, h, min, s);
+        return new ValorTimestamp(a, m, d, h, min, s, timezone);
 	}
 }
 
-/*
 Valor PValorDuration():
 {
     Token hora;
@@ -537,7 +528,7 @@ Valor PValorTimezone():
         }
     )
 }
-*/
+
 
 Valor PValor() :
 {
@@ -549,7 +540,7 @@ Valor PValor() :
 		| retorno = PValorBooleano()
 		| retorno = PValorString()
 		| retorno = PValorTimeStamp()
-		// | retorno = PValorDuration()
+		| retorno = PValorDuration()
     )
 	
 	{
@@ -593,7 +584,6 @@ Expressao PExpLength() :
 Expressao PExpPrimaria() :
 {
     Expressao retorno;
-	Id prop;
 }
 {
 	(  
@@ -601,12 +591,6 @@ Expressao PExpPrimaria() :
 	  | retorno = PValor() 
 	  | <LPAREN> retorno = PExpressao() <RPAREN>
 	)
-	[
-		<DOT> prop = PId()
-        {
-            retorno = new ExpAcessProperty(retorno, prop);
-        }
-	]
 	{
 		return retorno; 
 	}
@@ -652,21 +636,18 @@ Expressao PExpBinaria() :
 			retorno = PExpLT()
 		|  LOOKAHEAD (PExpPrimaria() <GT>)
 			retorno = PExpGT()
+		|  LOOKAHEAD (PExpPrimaria() <NE>)
+			retorno = PExpNE()
 		|  LOOKAHEAD (PExpPrimaria() <GE>)
 			retorno = PExpGE()
 		|  LOOKAHEAD (PExpPrimaria() <LE>)
 			retorno = PExpLE()
-/*
-		|  LOOKAHEAD (PExpPrimaria() <NE>)
-			retorno = PExpNE()
 		|  LOOKAHEAD (PExpPrimaria() <STAR>)
 			retorno = PExpStar()
 		|  LOOKAHEAD (PExpPrimaria() <SLASH>)
 			retorno = PExpSlash()
 		|   LOOKAHEAD (PExpPrimaria() <IN>)
 			retorno = PExpIN()
-*/
-
 	)
 	{
 		return retorno;
@@ -772,6 +753,18 @@ ExpGT PExpGT() :
 	{return new ExpGT(esq, dir);}
 }
 
+ExpNE PExpNE() :
+{
+	Expressao esq;
+	Expressao dir;
+}
+{
+	esq = PExpPrimaria()
+	<NE>
+	dir = PExpressao()
+	{return new ExpNE(esq, dir);}
+}
+
 ExpGE PExpGE() :
 {
 	Expressao esq;
@@ -795,20 +788,6 @@ ExpLE PExpLE() :
 	dir = PExpressao()
 	{return new ExpLE(esq, dir);}
 }
-
-/*
-ExpNE PExpNE() :
-{
-	Expressao esq;
-	Expressao dir;
-}
-{
-	esq = PExpPrimaria()
-	<NE>
-	dir = PExpressao()
-	{return new ExpNE(esq, dir);}
-}
-
 
 
 ExpStar PExpStar() :
@@ -846,7 +825,7 @@ ExpIN PExpIN() :
 	dir = PValorTimezone()
 	{return new ExpIN(esq, dir);}
 }
-*/
+
 
 Expressao PExpressao() :
 {
@@ -857,7 +836,7 @@ Expressao PExpressao() :
 	    LOOKAHEAD (2) 
 	  		retorno = PExpUnaria()
 	  | LOOKAHEAD (PExpPrimaria() (<OR> | <AND> | <MINUS> | <PLUS> | <EQ> | <CONCAT> | <LT> 
-	  							   | <GT> | <GE> | <LE> | <NE> | <STAR> | <SLASH>)) 
+	  							   | <GT> | <NE> | <GE> | <LE> | <STAR> | <SLASH>)) 
 	  		retorno = PExpBinaria()
 	  |
 	    retorno = PExpPrimaria()

@@ -49,6 +49,13 @@ public abstract class ValorConcreto<T> implements Valor {
 		return left.compareTo(right) < 0;
 	}
 
+	public boolean isLessOrEquals(ValorConcreto<T> obj) {
+		String left = String.valueOf(this.valor());
+		String right = String.valueOf(obj.valor());
+
+		return left.compareTo(right) <= 0;
+	}
+
 	/**
 	 * Retorna o valor deste valor primitivo, i.e, ele mesmo.
 	 */
@@ -61,7 +68,7 @@ public abstract class ValorConcreto<T> implements Valor {
 	 * v&aacute;lida.
 	 * 
 	 * @param amb
-	 *            o ambiente de compila��o.
+	 *            o ambiente de compilação.
 	 * @return <code>true</code> se os tipos da expressao sao validos;
 	 *         <code>false</code> caso contrario.
 	 */
