@@ -3,7 +3,6 @@ package li2.plp.expressions2.expression;
 import li2.plp.expressions1.util.TimeStamp;
 import li2.plp.expressions1.util.Tipo;
 import li2.plp.expressions1.util.TipoPrimitivo;
-import java.util.Optional;
 
 public class ValorTimestamp extends ValorConcreto<TimeStamp> {
 
@@ -12,26 +11,6 @@ public class ValorTimestamp extends ValorConcreto<TimeStamp> {
      */
     public ValorTimestamp(TimeStamp valor) {
         super(valor);
-    }
-
-    public ValorTimestamp(int year, int month, int day, int hour, int minute, int second) {
-        super(new TimeStamp(year, month, day, hour, minute, second,
-                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()));
-    }
-
-    public ValorTimestamp(int year, int month, int day, int hour, int minute, int second,
-            String timezone) {
-        super(new TimeStamp(year, month, day, hour, minute, second, Optional.ofNullable(timezone), Optional.empty(),
-                Optional.empty(),
-                Optional.empty()));
-    }
-
-    public ValorTimestamp(int year, int month, int day, int hour, int minute, int second,
-            String tzSignal, Integer tzHour,
-            Integer tzMinute) {
-        super(new TimeStamp(year, month, day, hour, minute, second, Optional.empty(), Optional.ofNullable(tzSignal),
-                Optional.ofNullable(tzHour),
-                Optional.ofNullable(tzMinute)));
     }
 
     public Tipo getTipo(li2.plp.expressions2.memory.AmbienteCompilacao amb) {
@@ -43,22 +22,30 @@ public class ValorTimestamp extends ValorConcreto<TimeStamp> {
                 + valor().hour.toString() + ":" + valor().minute.toString() + ":" + valor().second.toString();
     }
 
-    public Integer acessProperty(String prop) {
+    public String acessProperty(String prop) {
         switch (prop) {
             case "year":
-                return valor().year;
+                return valor().year.toString();
             case "month":
-                return valor().month;
+                return valor().month.toString();
             case "day":
-                return valor().day;
+                return valor().day.toString();
             case "hour":
-                return valor().hour;
+                return valor().hour.toString();
             case "minute":
-                return valor().minute;
+                return valor().minute.toString();
             case "second":
-                return valor().second;
+                return valor().second.toString();
+            case "tz":
+                if (valor().tz_str != null) {
+                    return valor().tz_str;
+                }
+                if (valor().tz_signal != null && valor().tz_hour != null && valor().tz_minute != null) {
+                    return valor().tz_signal + valor().tz_hour.toString() + ":" + valor().tz_minute.toString();
+                }
+                return "Timezone is not defined";
             default:
-                throw new RuntimeException("Propriedade inválida para Timestamp: " + prop);
+                throw new RuntimeException("Invalid property for timestamp: " + prop);
         }
     }
 

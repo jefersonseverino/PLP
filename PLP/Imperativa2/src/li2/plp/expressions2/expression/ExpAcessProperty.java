@@ -15,13 +15,13 @@ public class ExpAcessProperty extends ExpProperty {
 
     public Tipo getTipo(AmbienteCompilacao amb)
             throws VariavelNaoDeclaradaException, VariavelJaDeclaradaException {
-        return TipoPrimitivo.INTEIRO;
+        return TipoPrimitivo.STRING;
     }
 
     public Valor avaliar(AmbienteExecucao amb) throws VariavelNaoDeclaradaException, VariavelJaDeclaradaException {
         expressao = expressao.reduzir(amb);
         String propName = propriedade.toString();
-        return new ValorInteiro(((ValorTimestamp) expressao).acessProperty(propName));
+        return new ValorString(((ValorTimestamp) expressao).acessProperty(propName));
     }
 
     @Override

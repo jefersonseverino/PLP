@@ -468,20 +468,22 @@ Valor PValorTimeStamp():
         int h = Integer.parseInt(hora.toString());
         int min = Integer.parseInt(minuto.toString());
         int s = Integer.parseInt(segundo.toString());
+		TimeStamp ts = null;
 
 		if (tz_str != null) {
 			String timezoneStr = tz_str.toString();
-			return new ValorTimestamp(a, m, d, h, min, s, timezoneStr);
-		}
-
-		if (tz_sinal != null) {
+			ts = new TimeStamp(a, m, d, h, min, s, timezoneStr);
+		} else if (tz_sinal != null) {
 			String timezoneSignal = tz_sinal.toString();
 			int timezoneHour = Integer.parseInt(tz_hora.toString());
 			int timezoneMinute = Integer.parseInt(tz_minuto.toString());
-			return new ValorTimestamp(a, m, d, h, min, s, timezoneSignal, timezoneHour, timezoneMinute);
+			ts = new TimeStamp(a, m, d, h, min, s, timezoneSignal, timezoneHour, timezoneMinute);
+		} else {
+			ts = new TimeStamp(a, m, d, h, min, s);
 		}
 
-        return new ValorTimestamp(a, m, d, h, min, s);
+		ValorTimestamp timestamp = new ValorTimestamp(ts);
+        return timestamp;
 	}
 }
 
