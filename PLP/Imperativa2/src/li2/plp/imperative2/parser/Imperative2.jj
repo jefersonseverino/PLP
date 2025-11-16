@@ -150,11 +150,15 @@ TOKEN : /* LITERALS */
       | <OCTAL_LITERAL> (["l","L"])?
   >
 |
-  < #DECIMAL_LITERAL: ["1"-"9"] (["0"-"9"])* >
+  < #DIGITS: (["0"-"9"])+ >
+|
+  < #DECIMAL_LITERAL: ["1"-"9"] (<DIGITS>)* >
 |
   < #HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
 |
   < #OCTAL_LITERAL: "0" (["0"-"7"])* >
+|
+  < DURATION_LITERAL: (<DIGITS> "h") ( <DIGITS> "m" ( <DIGITS> "s" )? )? >
 |
   < STRING_LITERAL:
       "\""
@@ -485,33 +489,37 @@ Valor PValorTimeStamp():
 	}
 }
 
-/*
 Valor PValorDuration():
 {
-    Token hora;
-    Token minuto = null;
-    Token segundo = null;
+	Token durToken;
+    String str;
+    Integer h = null, m = null, s = null;
+    
+    java.util.regex.Pattern p = java.util.regex.Pattern.compile("(\\d+)h(?:(\\d+)m(?:(\\d+)s)?)?");
+    java.util.regex.Matcher matcher;
 }
 {
-    hora = <INTEGER_LITERAL> "h"
-    [ minuto = <INTEGER_LITERAL> "m" [ segundo = <INTEGER_LITERAL> "s" ] ]
-    {
-        int h = Integer.parseInt(hora.image);
-        Integer m = null;
-        Integer s = null;
-
-        if (minuto != null) {
-            m = Integer.parseInt(minuto.image);
+	durToken = <DURATION_LITERAL>
+	{
+		str = durToken.image;
+        matcher = p.matcher(str);
+        
+        if (matcher.matches()) {
+            h = Integer.parseInt(matcher.group(1));
+            
+            if (matcher.group(2) != null) {
+                m = Integer.parseInt(matcher.group(2));
+            }
+            if (matcher.group(3) != null) {
+                s = Integer.parseInt(matcher.group(3));
+            }
+            
+            return new ValorDuration(h, m, s);
         }
-
-        if (segundo != null) {
-            s = Integer.parseInt(segundo.image);
-        }
-
-        return new ValorDuration(h, m, s);
-    }
+	}
 }
 
+/*
 Valor PValorTimezone():
 {
     Token sinal = null;
@@ -549,7 +557,7 @@ Valor PValor() :
 		| retorno = PValorBooleano()
 		| retorno = PValorString()
 		| retorno = PValorTimeStamp()
-		// | retorno = PValorDuration()
+		| retorno = PValorDuration()
     )
 	
 	{
