@@ -12,6 +12,10 @@ public class ValorDuration extends ValorConcreto<Duration> {
         super(valor);
     }
 
+    public ValorDuration(int totalSeconds) {
+        super(new Duration(totalSeconds));
+    }
+
     public ValorDuration(int h, Integer m, Integer s) {
         super(new Duration(h, m, s));
     }

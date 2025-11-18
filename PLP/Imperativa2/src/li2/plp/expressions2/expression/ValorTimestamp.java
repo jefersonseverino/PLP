@@ -89,6 +89,17 @@ public class ValorTimestamp extends ValorConcreto<TimeStamp> {
         return valor().daysPerMonth;
     }
 
+    public Integer totalSeconds() {
+        Integer total = 0;
+        total += this.getSecond();
+        total += this.getMinute() * 60;
+        total += this.getHour() * 3600;
+        total += this.getDay() * 86400;
+        total += this.getMonth() * 2592000;
+        total += this.getYear() * 31536000;
+        return total;
+    }
+
     public ValorTimestamp clone() {
         return new ValorTimestamp(this.valor());
     }

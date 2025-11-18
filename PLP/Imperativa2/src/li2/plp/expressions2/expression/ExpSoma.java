@@ -23,6 +23,48 @@ public class ExpSoma extends ExpBinaria {
 		super(esq, dir, "+");
 	}
 
+	public ValorTimestamp sumTimestampAndDuration(ValorTimestamp timestamp, ValorDuration duration) {
+		Integer[] daysPerMonth = timestamp.getDaysPerMonth();
+		Integer year = timestamp.getYear();
+		Integer month = timestamp.getMonth();
+		Integer day = timestamp.getDay();
+		Integer hour = timestamp.getHour();
+		Integer minute = timestamp.getMinute();
+		Integer second = timestamp.getSecond();
+
+		Integer totalDuration = duration.getTotalSeconds();
+
+		second += totalDuration;
+		
+		minute += second / 60;
+		second %= 60;
+
+		hour += minute / 60;
+		minute %= 60;
+
+		day += hour / 24;
+		hour %= 24;
+
+		if (month == 2 && timestamp.isLeapYear(year)) {
+			daysPerMonth[2] = 29;
+		}
+
+		while (day > daysPerMonth[month]) {
+			day -= daysPerMonth[month];
+			month++;
+
+			if (month > 12) {
+				month = 1;
+				year++;
+			}
+
+			if (month == 2) {
+				daysPerMonth[2] = timestamp.isLeapYear(year) ? 29 : 28;
+			}
+		}
+
+		return new ValorTimestamp(year, month, day, hour, minute, second);
+	}
 
 	/**
 	 * Retorna o valor da Expressao de Soma
@@ -37,47 +79,7 @@ public class ExpSoma extends ExpBinaria {
 		if (esq instanceof ValorTimestamp && dir instanceof ValorDuration) {
 			ValorTimestamp timestamp = (ValorTimestamp) esq;
 			ValorDuration duration = (ValorDuration) dir;
-
-			Integer[] daysPerMonth = timestamp.getDaysPerMonth();
-			Integer year = timestamp.getYear();
-			Integer month = timestamp.getMonth();
-			Integer day = timestamp.getDay();
-			Integer hour = timestamp.getHour();
-			Integer minute = timestamp.getMinute();
-			Integer second = timestamp.getSecond();
-
-			Integer totalDuration = duration.getTotalSeconds();
-
-			second += totalDuration;
-			
-			minute += second / 60;
-			second %= 60;
-
-			hour += minute / 60;
-			minute %= 60;
-
-			day += hour / 24;
-			hour %= 24;
-
-			if (month == 2 && timestamp.isLeapYear(year)) {
-				daysPerMonth[2] = 29;
-			}
-
-			while (day > daysPerMonth[month]) {
-				day -= daysPerMonth[month];
-				month++;
-
-				if (month > 12) {
-					month = 1;
-					year++;
-				}
-
-				if (month == 2) {
-					daysPerMonth[2] = timestamp.isLeapYear(year) ? 29 : 28;
-				}
-    		}
-
-			return new ValorTimestamp(year, month, day, hour, minute, second);
+			return sumTimestampAndDuration(timestamp, duration);
 		}
 
 		return new ValorInteiro(

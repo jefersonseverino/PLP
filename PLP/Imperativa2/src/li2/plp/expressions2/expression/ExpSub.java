@@ -13,64 +13,79 @@ public class ExpSub extends ExpBinaria {
 		super(esq, dir, "-");
 	}
 
+	public ValorTimestamp subTimestampAndDuration(ValorTimestamp timestamp, ValorDuration duration) {
+		Integer[] daysPerMonth = timestamp.getDaysPerMonth();
+		Integer year = timestamp.getYear();
+		Integer month = timestamp.getMonth();
+		Integer day = timestamp.getDay();
+		Integer hour = timestamp.getHour();
+		Integer minute = timestamp.getMinute();
+		Integer second = timestamp.getSecond();
+
+		Integer totalDuration = duration.getTotalSeconds();
+
+		second -= totalDuration;
+
+		while (second < 0) {
+			second += 60;
+			minute--;
+		}
+
+		while (minute < 0) {
+			minute += 60;
+			hour--;
+		}
+
+		while (hour < 0) {
+			hour += 24;
+			day--;
+		}
+
+		if (month == 2 && timestamp.isLeapYear(year)) {
+			daysPerMonth[2] = 29;
+		}
+
+		while (day <= 0) {
+			month--;
+
+			if (month <= 0) {
+				month = 12;
+				year--;
+			}
+
+			if (month == 2) {
+				daysPerMonth[2] = timestamp.isLeapYear(year) ? 29 : 28;
+			}
+
+			day += daysPerMonth[month];
+		}
+
+		return new ValorTimestamp(year, month, day, hour, minute, second);
+	}
+
+	public ValorDuration subTimestamps(ValorTimestamp t1, ValorTimestamp t2) {
+		// TODO: check if t1 is greater than t2 !! Implement > operator for Timestamp type
+		Integer totalSeconds1 = t1.totalSeconds();
+		Integer totalSeconds2 = t2.totalSeconds();
+
+		return new ValorDuration(totalSeconds1 - totalSeconds2);
+	}
+
 	@Override
 	public Valor avaliar(AmbienteExecucao amb) throws VariavelNaoDeclaradaException, VariavelJaDeclaradaException {
-
 		Valor esq = getEsq().avaliar(amb);
 		Valor dir = getDir().avaliar(amb);
 
 		if (esq instanceof ValorTimestamp && dir instanceof ValorDuration) {
-
 			ValorTimestamp timestamp = (ValorTimestamp) esq;
 			ValorDuration duration = (ValorDuration) dir;
+			return subTimestampAndDuration(timestamp, duration);
+		}
 
-			Integer[] daysPerMonth = timestamp.getDaysPerMonth();
-			Integer year = timestamp.getYear();
-			Integer month = timestamp.getMonth();
-			Integer day = timestamp.getDay();
-			Integer hour = timestamp.getHour();
-			Integer minute = timestamp.getMinute();
-			Integer second = timestamp.getSecond();
-
-			Integer totalDuration = duration.getTotalSeconds();
-
-			second -= totalDuration;
-
-			while (second < 0) {
-				second += 60;
-				minute--;
-			}
-
-			while (minute < 0) {
-				minute += 60;
-				hour--;
-			}
-
-			while (hour < 0) {
-				hour += 24;
-				day--;
-			}
-
-			if (month == 2 && timestamp.isLeapYear(year)) {
-				daysPerMonth[2] = 29;
-			}
-
-			while (day <= 0) {
-				month--;
-
-				if (month <= 0) {
-					month = 12;
-					year--;
-				}
-
-				if (month == 2) {
-					daysPerMonth[2] = timestamp.isLeapYear(year) ? 29 : 28;
-				}
-
-				day += daysPerMonth[month];
-			}
-
-			return new ValorTimestamp(year, month, day, hour, minute, second);
+		if (esq instanceof ValorTimestamp && dir instanceof ValorTimestamp) {
+			ValorTimestamp t1 = (ValorTimestamp) esq;
+			ValorTimestamp t2 = (ValorTimestamp) dir;
+			return subTimestamps(t1, t2);
 		}
 
 		return new ValorInteiro(
@@ -85,6 +100,7 @@ public class ExpSub extends ExpBinaria {
 		return (
 			getEsq().getTipo(ambiente).eInteiro() && getDir().getTipo(ambiente).eInteiro()
 			|| getEsq().getTipo(ambiente).eTimeStamp() && getDir().getTipo(ambiente).eDuration()
+			|| getEsq().getTipo(ambiente).eTimeStamp() && getDir().getTipo(ambiente).eTimeStamp()
 		);
 	}
 
