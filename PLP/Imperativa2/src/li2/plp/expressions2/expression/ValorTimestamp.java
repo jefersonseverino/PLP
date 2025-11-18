@@ -38,11 +38,6 @@ public class ValorTimestamp extends ValorConcreto<TimeStamp> {
         return TipoPrimitivo.TIMESTAMP;
     }
 
-    public String toString() {
-        return valor().day.toString() + "/" + valor().month.toString() + "/" + valor().year.toString() + " "
-                + valor().hour.toString() + ":" + valor().minute.toString() + ":" + valor().second.toString();
-    }
-
     public Integer acessProperty(String prop) {
         switch (prop) {
             case "year":
@@ -60,6 +55,38 @@ public class ValorTimestamp extends ValorConcreto<TimeStamp> {
             default:
                 throw new RuntimeException("Propriedade inválida para Timestamp: " + prop);
         }
+    }
+
+    public Integer getYear() {
+        return valor().year;
+    }
+
+    public Integer getMonth() {
+        return valor().month;
+    }
+
+    public Integer getDay() {
+        return valor().day;
+    }
+
+    public Integer getHour() {
+        return valor().hour;
+    }
+
+    public Integer getMinute() {
+        return valor().minute;
+    }
+
+    public Integer getSecond() {
+        return valor().second;
+    }
+
+    public boolean isLeapYear(Integer year) {
+        return (year % 400 == 0) || (year % 4 == 0 && year % 100 != 0);
+    }
+
+    public Integer[] getDaysPerMonth() {
+        return valor().daysPerMonth;
     }
 
     public ValorTimestamp clone() {

@@ -16,6 +16,10 @@ public class ValorDuration extends ValorConcreto<Duration> {
         super(new Duration(h, m, s));
     }
 
+    public Integer getTotalSeconds() {
+        return valor().totalSeconds;
+    }
+
     @Override
     public Tipo getTipo(AmbienteCompilacao amb) {
         return TipoPrimitivo.DURATION;
