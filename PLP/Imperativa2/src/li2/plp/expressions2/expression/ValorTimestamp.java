@@ -6,9 +6,6 @@ import li2.plp.expressions1.util.TipoPrimitivo;
 
 public class ValorTimestamp extends ValorConcreto<TimeStamp> {
 
-    /**
-     * Cria um objeto encapsulando o TimeStamp fornecido.
-     */
     public ValorTimestamp(TimeStamp valor) {
         super(valor);
     }
@@ -18,8 +15,17 @@ public class ValorTimestamp extends ValorConcreto<TimeStamp> {
     }
 
     public String toString() {
-        return valor().day.toString() + "/" + valor().month.toString() + "/" + valor().year.toString() + " "
-                + valor().hour.toString() + ":" + valor().minute.toString() + ":" + valor().second.toString();
+        String dateTime = String.format("@%04d-%02d-%02d@%02d:%02d:%02d",
+            valor().year, valor().month, valor().day,
+            valor().hour, valor().minute, valor().second);
+        
+        if (valor().tz_str != null) {
+            return dateTime + " \"" + valor().tz_str + "\"";
+        }
+        if (valor().tz_signal != null && valor().tz_hour != null && valor().tz_minute != null) {
+            return dateTime + " " + valor().tz_signal + String.format("%02d:%02d", valor().tz_hour, valor().tz_minute);
+        }
+        return dateTime + " \"UTC\"";
     }
 
     public String acessProperty(String prop) {
@@ -41,12 +47,17 @@ public class ValorTimestamp extends ValorConcreto<TimeStamp> {
                     return valor().tz_str;
                 }
                 if (valor().tz_signal != null && valor().tz_hour != null && valor().tz_minute != null) {
-                    return valor().tz_signal + valor().tz_hour.toString() + ":" + valor().tz_minute.toString();
+                    return valor().tz_signal + String.format("%02d:%02d", valor().tz_hour, valor().tz_minute);
                 }
-                return "Timezone is not defined";
+                return "UTC";
             default:
                 throw new RuntimeException("Invalid property for timestamp: " + prop);
         }
+    }
+
+    public ValorTimestamp convertToTimezone(String targetTimezone) {
+        TimeStamp converted = valor().convertToTimezone(targetTimezone);
+        return new ValorTimestamp(converted);
     }
 
     public ValorTimestamp clone() {
