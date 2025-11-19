@@ -74,7 +74,7 @@ public enum TipoPrimitivo implements Tipo {
 	 * @see li2.plp.expressions1.util.Tipo#eValido()
 	 */
 	public boolean eValido() {
-		return this.nome != null && nome.length() > 0 && this.nome != "TIMESTAMP"; // REMOVE LATER
+		return this.nome != null && nome.length() > 0;
 	}
 
 	/* (non-Javadoc)
