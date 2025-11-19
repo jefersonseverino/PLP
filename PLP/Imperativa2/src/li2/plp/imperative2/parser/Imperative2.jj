@@ -132,6 +132,8 @@ TOKEN : /* TOKENS DE IMPERATIVA 2 */
 {
   < PROC: "proc" >
 | < CALL: "call" >
+| < IN: "in" >
+| < TIMESTAMP_NUMBER: (["0"-"9"])+ >
 }
 
 TOKEN : /* TOKENS DOS POSS�VEIS TIPOS */
@@ -251,7 +253,6 @@ TOKEN : /* OPERATORS */
 | < BIT_OR: "|" >
 | < XOR: "^" >
 | < REM: "%" >
-| < IN: "in" >
 }
 
 Programa Input() :
@@ -446,19 +447,19 @@ Valor PValorTimeStamp():
 }
 {
     "@" 
-    ano = <INTEGER_LITERAL> "-" 
-    mes = <INTEGER_LITERAL> "-" 
-    dia = <INTEGER_LITERAL> 
+    ano = <TIMESTAMP_NUMBER> "-" 
+    mes = <TIMESTAMP_NUMBER> "-" 
+    dia = <TIMESTAMP_NUMBER> 
     "@" 
-    hora = <INTEGER_LITERAL> ":" 
-    minuto = <INTEGER_LITERAL> ":" 
-    segundo = <INTEGER_LITERAL>
+    hora = <TIMESTAMP_NUMBER> ":" 
+    minuto = <TIMESTAMP_NUMBER> ":" 
+    segundo = <TIMESTAMP_NUMBER>
     [
         (
             tz_str = <STRING_LITERAL>
             |
             (tz_sinal = <PLUS> | tz_sinal = <MINUS>)
-            tz_hora = <INTEGER_LITERAL> ":" tz_minuto = <INTEGER_LITERAL>
+            tz_hora = <TIMESTAMP_NUMBER> ":" tz_minuto = <TIMESTAMP_NUMBER>
         )
     ]
 	{
@@ -487,34 +488,7 @@ Valor PValorTimeStamp():
 	}
 }
 
-/*
-Valor PValorDuration():
-{
-    Token hora;
-    Token minuto = null;
-    Token segundo = null;
-}
-{
-    hora = <INTEGER_LITERAL> "h"
-    [ minuto = <INTEGER_LITERAL> "m" [ segundo = <INTEGER_LITERAL> "s" ] ]
-    {
-        int h = Integer.parseInt(hora.image);
-        Integer m = null;
-        Integer s = null;
-
-        if (minuto != null) {
-            m = Integer.parseInt(minuto.image);
-        }
-
-        if (segundo != null) {
-            s = Integer.parseInt(segundo.image);
-        }
-
-        return new ValorDuration(h, m, s);
-    }
-}
-
-Valor PValorTimezone():
+ValorTimezone PValorTimezone():
 {
     Token sinal = null;
     Token horas = null;
@@ -528,18 +502,17 @@ Valor PValorTimezone():
             return new ValorTimezone(texto.image);
         }
     |
-        sinal = (<PLUS> | <MINUS>)
-        horas = <INTEGER_LITERAL> ":" minutos = <INTEGER_LITERAL>
+        (sinal = <PLUS> | sinal = <MINUS>)
+        horas = <TIMESTAMP_NUMBER> ":" minutos = <TIMESTAMP_NUMBER>
         {
             int h = Integer.parseInt(horas.image);
             int m = Integer.parseInt(minutos.image);
-            boolean positivo = sinal.kind == PLUS;  // true se for '+'
+            boolean positivo = sinal.kind == PLUS;
 
             return new ValorTimezone(positivo, h, m);
         }
     )
 }
-*/
 
 Valor PValor() :
 {
@@ -658,6 +631,8 @@ Expressao PExpBinaria() :
 			retorno = PExpGE()
 		|  LOOKAHEAD (PExpPrimaria() <LE>)
 			retorno = PExpLE()
+		|  LOOKAHEAD (PExpPrimaria() <IN>)
+			retorno = PExpIN()
 /*
 		|  LOOKAHEAD (PExpPrimaria() <NE>)
 			retorno = PExpNE()
@@ -665,8 +640,6 @@ Expressao PExpBinaria() :
 			retorno = PExpStar()
 		|  LOOKAHEAD (PExpPrimaria() <SLASH>)
 			retorno = PExpSlash()
-		|   LOOKAHEAD (PExpPrimaria() <IN>)
-			retorno = PExpIN()
 */
 
 	)
@@ -798,6 +771,18 @@ ExpLE PExpLE() :
 	{return new ExpLE(esq, dir);}
 }
 
+ExpIN PExpIN() :
+{
+	Expressao esq;
+	ValorTimezone dir;
+}
+{
+	esq = PExpPrimaria()
+	<IN>
+	dir = PValorTimezone()
+	{return new ExpIN(esq, dir);}
+}
+
 /*
 ExpNE PExpNE() :
 {
@@ -859,7 +844,7 @@ Expressao PExpressao() :
 	    LOOKAHEAD (2) 
 	  		retorno = PExpUnaria()
 	  | LOOKAHEAD (PExpPrimaria() (<OR> | <AND> | <MINUS> | <PLUS> | <EQ> | <CONCAT> | <LT> 
-	  							   | <GT> | <GE> | <LE> | <NE> | <STAR> | <SLASH>)) 
+	  							   | <GT> | <GE> | <LE> | <NE> | <STAR> | <SLASH> | <IN>)) 
 	  		retorno = PExpBinaria()
 	  |
 	    retorno = PExpPrimaria()
