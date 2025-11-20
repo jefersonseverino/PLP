@@ -69,11 +69,4 @@
       </plugin>
     </plugins>
   </build>
-  <dependencies>
-    <dependency>
-      <groupId>Expressoes2</groupId>
-      <artifactId>Expressoes2</artifactId>
-      <version>0.0.1</version>
-    </dependency>
-  </dependencies>
 </project>

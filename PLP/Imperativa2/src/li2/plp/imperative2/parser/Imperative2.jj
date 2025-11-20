@@ -825,13 +825,13 @@ ExpLE PExpLE() :
 ExpIN PExpIN() :
 {
 	Expressao esq;
-	ValorTimezone dir;
+	Valor dir;
 }
 {
 	esq = PExpPrimaria()
 	<IN>
 	dir = PValorTimezone()
-	{return new ExpIN(esq, dir);}
+	{return new ExpIN(esq, (ValorTimezone) dir);}
 }
 
 ExpFormat PExpFormat() : 

@@ -6,15 +6,7 @@
     <packaging>pom</packaging>
     <version>1</version>
     <modules>
-        <module>Expressoes1</module>
-        <module>Expressoes2</module>
-        <module>Funcional1</module>
-        <module>Funcional2</module>
-        <module>Funcional3</module>
-        <module>Imperativa1</module>
         <module>Imperativa2</module>
-        <module>Objetos1</module>
-        <module>Objetos2</module>
         <module>Applet</module>
     </modules>
 </project>
