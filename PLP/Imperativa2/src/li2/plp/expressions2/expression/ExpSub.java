@@ -1,5 +1,6 @@
 package li2.plp.expressions2.expression;
 
+import li2.plp.expressions1.util.TimeStamp;
 import li2.plp.expressions1.util.Tipo;
 import li2.plp.expressions1.util.TipoPrimitivo;
 import li2.plp.expressions2.memory.AmbienteCompilacao;
@@ -60,7 +61,8 @@ public class ExpSub extends ExpBinaria {
 			day += daysPerMonth[month];
 		}
 
-		return new ValorTimestamp(year, month, day, hour, minute, second);
+		TimeStamp ts = new TimeStamp(year, month, day, hour, minute, second);
+		return new ValorTimestamp(ts);
 	}
 
 	public ValorDuration subTimestamps(ValorTimestamp t1, ValorTimestamp t2) {

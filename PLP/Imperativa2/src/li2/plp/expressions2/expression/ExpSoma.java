@@ -1,5 +1,6 @@
 package li2.plp.expressions2.expression;
 
+import li2.plp.expressions1.util.TimeStamp;
 import li2.plp.expressions1.util.Tipo;
 import li2.plp.expressions1.util.TipoPrimitivo;
 import li2.plp.expressions2.memory.AmbienteCompilacao;
@@ -62,8 +63,9 @@ public class ExpSoma extends ExpBinaria {
 				daysPerMonth[2] = timestamp.isLeapYear(year) ? 29 : 28;
 			}
 		}
-
-		return new ValorTimestamp(year, month, day, hour, minute, second);
+		
+		TimeStamp ts = new TimeStamp(year, month, day, hour, minute, second);
+		return new ValorTimestamp(ts);
 	}
 
 	/**
