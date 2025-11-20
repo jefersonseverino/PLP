@@ -37,6 +37,14 @@ public class TipoProcedimento implements Tipo {
 		return false;
 	}
 
+	public boolean eDuration() {
+        return false;
+    }
+
+	public boolean eTimeStamp() {
+        return false;
+    }
+
 	public boolean eValido() {
 		boolean retorno = true;
 		for (Tipo tipo : tiposParametrosFormais) {
