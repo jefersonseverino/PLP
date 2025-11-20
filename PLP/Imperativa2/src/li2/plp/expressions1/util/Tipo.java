@@ -36,6 +36,10 @@ public interface Tipo {
 	 */
 	public abstract boolean eString();
 
+	public abstract boolean eTimeStamp();
+
+	public abstract boolean eDuration();
+
 	/**
 	 * Compara este tipo com o tipo dado.
 	 * Dois tipos s�o iguais se eles t�m o mesmo nome.

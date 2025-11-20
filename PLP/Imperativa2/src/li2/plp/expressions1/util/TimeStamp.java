@@ -17,6 +17,21 @@ public class TimeStamp {
     public Integer tz_hour;
     public Integer tz_minute;
 
+    public Integer[] daysPerMonth = { 0, 
+        31, // jan
+        28, // fev
+        31, // mar
+        30, // abr
+        31, // mai
+        30, // jun
+        31, // jul
+        31, // ago
+        30, // set
+        31, // out
+        30, // nov
+        31  // dez
+    };
+
     public TimeStamp(Integer year, Integer month, Integer day, Integer hour, Integer minute, Integer second) {
         this.year = year;
         this.month = month;
@@ -91,4 +106,12 @@ public class TimeStamp {
             targetTimezone
         );
     }
+
+    @Override
+    public String toString() {
+        return String.format("%04d-%02d-%02d %02d:%02d:%02d",
+            year, month, day, hour, minute, second
+        );
+    }
+
 }

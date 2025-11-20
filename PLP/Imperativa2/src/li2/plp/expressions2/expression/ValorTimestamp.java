@@ -55,6 +55,49 @@ public class ValorTimestamp extends ValorConcreto<TimeStamp> {
         }
     }
 
+    public Integer getYear() {
+        return valor().year;
+    }
+
+    public Integer getMonth() {
+        return valor().month;
+    }
+
+    public Integer getDay() {
+        return valor().day;
+    }
+
+    public Integer getHour() {
+        return valor().hour;
+    }
+
+    public Integer getMinute() {
+        return valor().minute;
+    }
+
+    public Integer getSecond() {
+        return valor().second;
+    }
+
+    public boolean isLeapYear(Integer year) {
+        return (year % 400 == 0) || (year % 4 == 0 && year % 100 != 0);
+    }
+
+    public Integer[] getDaysPerMonth() {
+        return valor().daysPerMonth;
+    }
+
+    public Integer totalSeconds() {
+        Integer total = 0;
+        total += this.getSecond();
+        total += this.getMinute() * 60;
+        total += this.getHour() * 3600;
+        total += this.getDay() * 86400;
+        total += this.getMonth() * 2592000;
+        total += this.getYear() * 31536000;
+        return total;
+    }
+
     public ValorTimestamp convertToTimezone(String targetTimezone) {
         TimeStamp converted = valor().convertToTimezone(targetTimezone);
         return new ValorTimestamp(converted);

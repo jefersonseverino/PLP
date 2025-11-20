@@ -1,5 +1,6 @@
 package li2.plp.expressions2.expression;
 
+import li2.plp.expressions1.util.TimeStamp;
 import li2.plp.expressions1.util.Tipo;
 import li2.plp.expressions1.util.TipoPrimitivo;
 import li2.plp.expressions2.memory.AmbienteCompilacao;
@@ -23,10 +24,66 @@ public class ExpSoma extends ExpBinaria {
 		super(esq, dir, "+");
 	}
 
+	public ValorTimestamp sumTimestampAndDuration(ValorTimestamp timestamp, ValorDuration duration) {
+		Integer[] daysPerMonth = timestamp.getDaysPerMonth();
+		Integer year = timestamp.getYear();
+		Integer month = timestamp.getMonth();
+		Integer day = timestamp.getDay();
+		Integer hour = timestamp.getHour();
+		Integer minute = timestamp.getMinute();
+		Integer second = timestamp.getSecond();
+
+		Integer totalDuration = duration.getTotalSeconds();
+
+		second += totalDuration;
+		
+		minute += second / 60;
+		second %= 60;
+
+		hour += minute / 60;
+		minute %= 60;
+
+		day += hour / 24;
+		hour %= 24;
+
+		if (month == 2 && timestamp.isLeapYear(year)) {
+			daysPerMonth[2] = 29;
+		}
+
+		while (day > daysPerMonth[month]) {
+			day -= daysPerMonth[month];
+			month++;
+
+			if (month > 12) {
+				month = 1;
+				year++;
+			}
+
+			if (month == 2) {
+				daysPerMonth[2] = timestamp.isLeapYear(year) ? 29 : 28;
+			}
+		}
+		
+		TimeStamp ts = new TimeStamp(year, month, day, hour, minute, second);
+		return new ValorTimestamp(ts);
+	}
+
 	/**
 	 * Retorna o valor da Expressao de Soma
 	 */
 	public Valor avaliar(AmbienteExecucao amb) throws VariavelNaoDeclaradaException, VariavelJaDeclaradaException {
+
+		// System.out.println(getEsq().avaliar(amb));
+
+		Valor esq = getEsq().avaliar(amb);
+		Valor dir = getDir().avaliar(amb);
+
+		if (esq instanceof ValorTimestamp && dir instanceof ValorDuration) {
+			ValorTimestamp timestamp = (ValorTimestamp) esq;
+			ValorDuration duration = (ValorDuration) dir;
+			return sumTimestampAndDuration(timestamp, duration);
+		}
+
 		return new ValorInteiro(
 			((ValorInteiro) getEsq().avaliar(amb)).valor() +
 			((ValorInteiro) getDir().avaliar(amb)).valor() );
@@ -45,7 +102,8 @@ public class ExpSoma extends ExpBinaria {
 	 */
 	protected boolean checaTipoElementoTerminal(AmbienteCompilacao ambiente)
 			throws VariavelNaoDeclaradaException, VariavelJaDeclaradaException {
-		return (getEsq().getTipo(ambiente).eInteiro() && getDir().getTipo(ambiente).eInteiro());
+		return (getEsq().getTipo(ambiente).eInteiro() && getDir().getTipo(ambiente).eInteiro()
+				|| getEsq().getTipo(ambiente).eTimeStamp() && getDir().getTipo(ambiente).eDuration());
 	}
 
 	/**

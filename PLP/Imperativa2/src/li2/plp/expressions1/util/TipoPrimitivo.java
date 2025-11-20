@@ -12,7 +12,8 @@ public enum TipoPrimitivo implements Tipo {
 	INTEIRO("INTEIRO"),
 	BOOLEANO("BOOLEANO"),
 	STRING("STRING"),
-	TIMESTAMP("TIMESTAMP");
+	TIMESTAMP("TIMESTAMP"),
+	DURATION("DURATION");
 
 	protected String nome;
 
@@ -53,6 +54,10 @@ public enum TipoPrimitivo implements Tipo {
 
 	public boolean eTimeStamp() {
 		return this.eIgual(TIMESTAMP);
+	}
+
+	public boolean eDuration() {
+		return this.eIgual(DURATION);
 	}
 
 	/* (non-Javadoc)
