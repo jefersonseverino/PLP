@@ -47,6 +47,7 @@
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
+          <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
       <plugin>
@@ -68,4 +69,11 @@
       </plugin>
     </plugins>
   </build>
+  <dependencies>
+    <dependency>
+      <groupId>Expressoes2</groupId>
+      <artifactId>Expressoes2</artifactId>
+      <version>0.0.1</version>
+    </dependency>
+  </dependencies>
 </project>
