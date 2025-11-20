@@ -134,6 +134,8 @@ TOKEN : /* TOKENS DE IMPERATIVA 2 */
 | < CALL: "call" >
 | < IN: "in" >
 | < TIMESTAMP_NUMBER: (["0"-"9"])+ >
+| < PARSE       : "parse" >
+| < FORMAT      : "format" >
 }
 
 TOKEN : /* TOKENS DOS POSS�VEIS TIPOS */
@@ -599,6 +601,17 @@ Expressao PExpLength() :
 	}
 }
 
+Expressao PExpParse() :
+{
+	Expressao retorno;
+}
+{
+	<PARSE> retorno = PExpressao()
+	{
+		return new ExpParser(retorno);
+	}
+}
+
 Expressao PExpPrimaria() :
 {
     Expressao retorno;
@@ -633,6 +646,8 @@ Expressao PExpUnaria() :
 	  retorno = PExpNot() 
 	| 
 	  retorno = PExpLength()
+	|
+	  retorno = PExpParse()
 	)
 	{
 		return retorno;
@@ -667,6 +682,8 @@ Expressao PExpBinaria() :
 			retorno = PExpLE()
 		|  LOOKAHEAD (PExpPrimaria() <IN>)
 			retorno = PExpIN()
+		| LOOKAHEAD (PExpPrimaria() <FORMAT>)
+			retorno = PExpFormat()
 /*
 		|  LOOKAHEAD (PExpPrimaria() <NE>)
 			retorno = PExpNE()
@@ -817,6 +834,20 @@ ExpIN PExpIN() :
 	{return new ExpIN(esq, dir);}
 }
 
+ExpFormat PExpFormat() : 
+{
+	Expressao esq;
+	Expressao dir;
+}
+{
+	esq = PExpPrimaria()
+	<FORMAT>
+	dir = PExpressao()
+	{
+		return new ExpFormat(esq, dir);
+	}
+}
+
 /*
 ExpNE PExpNE() :
 {
@@ -878,7 +909,7 @@ Expressao PExpressao() :
 	    LOOKAHEAD (2) 
 	  		retorno = PExpUnaria()
 	  | LOOKAHEAD (PExpPrimaria() (<OR> | <AND> | <MINUS> | <PLUS> | <EQ> | <CONCAT> | <LT> 
-	  							   | <GT> | <GE> | <LE> | <NE> | <STAR> | <SLASH> | <IN>)) 
+	  							   | <GT> | <GE> | <LE> | <NE> | <STAR> | <SLASH> | <IN> | <FORMAT>)) 
 	  		retorno = PExpBinaria()
 	  |
 	    retorno = PExpPrimaria()

@@ -23,11 +23,11 @@ Valor ::= ValorConcreto
 ValorConcreto ::= ValorInteiro
        | ValorBooleano
        | ValorString
-       | ValorTimestamp //
-       | ValorDuration //
+       | ValorTimestamp
+       | ValorDuration
 
 ValorTimestamp ::= "@" ValorInteiro "-" ValorInteiro "-" ValorInteiro
-                    "T" ValorInteiro ":" ValorInteiro ":" ValorInteiro [ ValorTimezone ] // 
+                    "@" ValorInteiro ":" ValorInteiro ":" ValorInteiro [ ValorTimezone ] // 
 
 ValorDuration ::= ValorInteiro "h" [ ValorInteiro "m" [ ValorInteiro "s" ] ]
 
@@ -36,6 +36,7 @@ ValorTimezone ::= ValorString | ("+" | "-") ValorInteiro ":" ValorInteiro
 ExpUnaria ::= “-“ Expressao
        | “not” Expressao
        | “length” Expressao
+       | "parse" Expressao
 
 ExpBinaria ::= Expressao “+” Expressao
        | Expressao “-“ Expressao
@@ -51,6 +52,7 @@ ExpBinaria ::= Expressao “+” Expressao
        | Expressao "*" Expressao // 
        | Expressao "/" Expressao //
        | Expressao "in" ValorTimezone // Convert timezone
+       | Expressao "format" Expressao
 
 ExpProperty ::= Expressao "." Id
 
