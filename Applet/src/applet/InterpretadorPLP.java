@@ -91,7 +91,7 @@ public class InterpretadorPLP extends JFrame {
 			jLabelListaEntrada.setBounds(new java.awt.Rectangle(20, 194, 127,
 					20));
 			jLabelListaEntrada
-					.setToolTipText("informe os valores da lista de entrada separados por espa�os");
+					.setToolTipText("informe os valores da lista de entrada separados por espaços");
 			jLabelListaEntrada.setText("Lista de Entrada");
 			jLabelExecutar = new JLabel();
 			jLabelExecutar.setBounds(new java.awt.Rectangle(19, 434, 157, 17));
@@ -101,7 +101,7 @@ public class InterpretadorPLP extends JFrame {
 			jLabelMasg.setText("Mensagens");
 			jLabelCodigo = new JLabel();
 			jLabelCodigo.setBounds(new java.awt.Rectangle(20, 33, 70, 16));
-			jLabelCodigo.setText("C�digo");
+			jLabelCodigo.setText("Código");
 			jContentPane = new JPanel();
 			jContentPane.setLayout(null);
 			jContentPane.add(getJScrollPaneMensagens(), null);
@@ -241,7 +241,7 @@ public class InterpretadorPLP extends JFrame {
 			jTextFieldListaEntrada.setBounds(new java.awt.Rectangle(20, 218,
 					350, 20));
 			jTextFieldListaEntrada
-					.setToolTipText("informe os valores da lista de entrada separados por espa�os");
+					.setToolTipText("informe os valores da lista de entrada separados por espaços");
 		}
 		return jTextFieldListaEntrada;
 	}

@@ -37,8 +37,8 @@ public class Read implements IO {
 		if (valorID.getTipo(null).eIgual(valorRead.getTipo(null))) {
 			ambiente.changeValor(id, valorRead );
 		}else{
-			throw new ErroTipoEntradaException("Tipo do valor de entrada lido incomp�tivel" +
-					" com tipo da vari�vel (" + id.getIdName() + ")");
+			throw new ErroTipoEntradaException("Tipo do valor de entrada lido incompativel" +
+					" com tipo da variável (" + id.getIdName() + ")");
 		}
 		
 		

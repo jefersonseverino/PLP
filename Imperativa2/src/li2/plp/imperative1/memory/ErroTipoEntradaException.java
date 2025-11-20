@@ -3,7 +3,7 @@ package li2.plp.imperative1.memory;
 public class ErroTipoEntradaException extends Exception {
 	
 	public ErroTipoEntradaException() {
-	    super("Tipo do valor de entrada lido incomp�tivel");
+	    super("Tipo do valor de entrada lido incompativel");
 	  }
 	
 	public ErroTipoEntradaException(String msg) {
