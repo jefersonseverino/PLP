@@ -15,9 +15,16 @@ public class ExpLT extends ExpBinaria {
 
     public Valor avaliar(AmbienteExecucao amb)
             throws VariavelNaoDeclaradaException, VariavelJaDeclaradaException {
-        ValorConcreto esq = (ValorConcreto) getEsq().avaliar(amb);
-        ValorConcreto dir = (ValorConcreto) getDir().avaliar(amb);
-        return new ValorBooleano(esq.isMenor(dir));
+        Valor esq = getEsq().avaliar(amb);
+        Valor dir = getDir().avaliar(amb);
+
+        if (esq instanceof ValorTimestamp && dir instanceof ValorTimestamp) {
+            ValorTimestamp tsEsq = (ValorTimestamp) esq;
+            ValorTimestamp tsDir = (ValorTimestamp) dir;
+            return new ValorBooleano(tsEsq.isLess(tsDir));
+        }
+
+        throw new RuntimeException("Less than not implemented for these types");
     }   
 
 	@Override
