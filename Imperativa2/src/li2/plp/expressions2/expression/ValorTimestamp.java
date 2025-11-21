@@ -107,4 +107,12 @@ public class ValorTimestamp extends ValorConcreto<TimeStamp> {
         return new ValorTimestamp(this.valor());
     }
 
+    public boolean isLess(ValorTimestamp other) {
+        return this.totalSeconds() < other.totalSeconds();
+    }
+
+    public boolean isEqual(ValorTimestamp other) {
+        return this.totalSeconds().equals(other.totalSeconds());
+    }
+
 }

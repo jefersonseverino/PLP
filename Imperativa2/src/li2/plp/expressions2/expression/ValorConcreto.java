@@ -42,7 +42,7 @@ public abstract class ValorConcreto<T> implements Valor {
 
 	}
 
-	public boolean isMenor(ValorConcreto<T> obj) {
+	public boolean isLess(ValorConcreto<T> obj) {
 		String left = String.valueOf(this.valor());
 		String right = String.valueOf(obj.valor());
 

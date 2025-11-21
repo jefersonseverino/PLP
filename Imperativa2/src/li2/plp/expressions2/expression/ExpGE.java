@@ -10,14 +10,21 @@ import li2.plp.expressions2.memory.VariavelNaoDeclaradaException;
 public class ExpGE extends ExpBinaria {
 
     public ExpGE(Expressao esq, Expressao dir) {
-        super(esq, dir, ">");
+        super(esq, dir, ">=");
     }
 
     public Valor avaliar(AmbienteExecucao amb)
             throws VariavelNaoDeclaradaException, VariavelJaDeclaradaException {
-        ValorConcreto esq = (ValorConcreto) getEsq().avaliar(amb);
-        ValorConcreto dir = (ValorConcreto) getDir().avaliar(amb);
-        return new ValorBooleano(dir.isLessOrEquals(esq));
+        Valor esq = getEsq().avaliar(amb);
+        Valor dir = getDir().avaliar(amb);
+
+        if (esq instanceof ValorTimestamp && dir instanceof ValorTimestamp) {
+            ValorTimestamp tsEsq = (ValorTimestamp) esq;
+            ValorTimestamp tsDir = (ValorTimestamp) dir;
+            return new ValorBooleano(tsDir.isLess(tsEsq) || tsDir.isEquals(tsEsq));
+        }
+
+        throw new RuntimeException("Greater or equal than not implemented for these types");
     }   
 
     public Tipo getTipo(AmbienteCompilacao amb)
