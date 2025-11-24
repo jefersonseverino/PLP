@@ -33,6 +33,7 @@ public class TimeStamp {
     };
 
     public TimeStamp(Integer year, Integer month, Integer day, Integer hour, Integer minute, Integer second) {
+        validateTimestamp(year, month, day, hour, minute, second);
         this.year = year;
         this.month = month;
         this.day = day;
@@ -43,6 +44,7 @@ public class TimeStamp {
     }
 
     public TimeStamp(Integer year, Integer month, Integer day, Integer hour, Integer minute, Integer second, String tz_str) {
+        validateTimestamp(year, month, day, hour, minute, second);
         this.year = year;
         this.month = month;
         this.day = day;
@@ -56,6 +58,8 @@ public class TimeStamp {
  
     public TimeStamp(Integer year, Integer month, Integer day, Integer hour, Integer minute, Integer second,
             String tz_signal, Integer tz_hour, Integer tz_minute) {
+        validateTimestamp(year, month, day, hour, minute, second);
+        validateTimezoneOffset(tz_hour, tz_minute);
         this.year = year;
         this.month = month;
         this.day = day;
@@ -68,6 +72,85 @@ public class TimeStamp {
         
         String sign = tz_signal.equals("+") ? "+" : "-";
         this.tz_str = String.format("%s%02d:%02d", sign, tz_hour, tz_minute);
+    }
+
+    // Validation methods
+    private static void validateTimestamp(Integer year, Integer month, Integer day, Integer hour, Integer minute, Integer second) {
+        if (!isValidYear(year)) {
+            throw new IllegalArgumentException("Invalid year: " + year + ". Must be greater than or equal to 1.");
+        }
+        if (!isValidMonth(month)) {
+            throw new IllegalArgumentException("Invalid month: " + month + ". Must be between 1 and 12.");
+        }
+        if (!isValidDay(day, month, year)) {
+            throw new IllegalArgumentException("Invalid day: " + day + ". Must be between 1 and " + getDaysInMonth(month, year) + " for month " + month + ".");
+        }
+        if (!isValidHour(hour)) {
+            throw new IllegalArgumentException("Invalid hour: " + hour + ". Must be between 0 and 23.");
+        }
+        if (!isValidMinute(minute)) {
+            throw new IllegalArgumentException("Invalid minute: " + minute + ". Must be between 0 and 59.");
+        }
+        if (!isValidSecond(second)) {
+            throw new IllegalArgumentException("Invalid second: " + second + ". Must be between 0 and 59.");
+        }
+    }
+
+    private static void validateTimezoneOffset(Integer tzHour, Integer tzMinute) {
+        if (!isValidTimezoneHour(tzHour)) {
+            throw new IllegalArgumentException("Invalid timezone offset hour: " + tzHour + ". Must be between -12 and +14.");
+        }
+        if (!isValidTimezoneMinute(tzMinute)) {
+            throw new IllegalArgumentException("Invalid timezone offset minute: " + tzMinute + ". Must be between 0 and 59.");
+        }
+    }
+
+    private static boolean isValidYear(Integer year) {
+        return year != null && year >= 1;
+    }
+
+    private static boolean isValidMonth(Integer month) {
+        return month != null && month >= 1 && month <= 12;
+    }
+
+    private static boolean isValidDay(Integer day, Integer month, Integer year) {
+        if (day == null || day < 1) {
+            return false;
+        }
+        int maxDay = getDaysInMonth(month, year);
+        return day <= maxDay;
+    }
+
+    private static int getDaysInMonth(Integer month, Integer year) {
+        Integer[] daysPerMonth = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+        if (month == 2 && isLeapYear(year)) {
+            return 29;
+        }
+        return daysPerMonth[month];
+    }
+
+    private static boolean isLeapYear(Integer year) {
+        return (year % 400 == 0) || (year % 4 == 0 && year % 100 != 0);
+    }
+
+    private static boolean isValidHour(Integer hour) {
+        return hour != null && hour >= 0 && hour <= 23;
+    }
+
+    private static boolean isValidMinute(Integer minute) {
+        return minute != null && minute >= 0 && minute <= 59;
+    }
+
+    private static boolean isValidSecond(Integer second) {
+        return second != null && second >= 0 && second <= 59;
+    }
+
+    private static boolean isValidTimezoneHour(Integer tzHour) {
+        return tzHour != null && tzHour >= -12 && tzHour <= 14;
+    }
+
+    private static boolean isValidTimezoneMinute(Integer tzMinute) {
+        return tzMinute != null && tzMinute >= 0 && tzMinute <= 59;
     }
 
     public ZoneId getZoneId() {

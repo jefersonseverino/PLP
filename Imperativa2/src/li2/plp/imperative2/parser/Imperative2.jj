@@ -477,16 +477,20 @@ Valor PValorTimeStamp():
         int s = Integer.parseInt(segundo.toString());
 		TimeStamp ts = null;
 
-		if (tz_str != null) {
-			String timezoneStr = tz_str.toString();
-			ts = new TimeStamp(a, m, d, h, min, s, timezoneStr);
-		} else if (tz_sinal != null) {
-			String timezoneSignal = tz_sinal.toString();
-			int timezoneHour = Integer.parseInt(tz_hora.toString());
-			int timezoneMinute = Integer.parseInt(tz_minuto.toString());
-			ts = new TimeStamp(a, m, d, h, min, s, timezoneSignal, timezoneHour, timezoneMinute);
-		} else {
-			ts = new TimeStamp(a, m, d, h, min, s);
+		try {
+			if (tz_str != null) {
+				String timezoneStr = tz_str.toString();
+				ts = new TimeStamp(a, m, d, h, min, s, timezoneStr);
+			} else if (tz_sinal != null) {
+				String timezoneSignal = tz_sinal.toString();
+				int timezoneHour = Integer.parseInt(tz_hora.toString());
+				int timezoneMinute = Integer.parseInt(tz_minuto.toString());
+				ts = new TimeStamp(a, m, d, h, min, s, timezoneSignal, timezoneHour, timezoneMinute);
+			} else {
+				ts = new TimeStamp(a, m, d, h, min, s);
+			}
+		} catch (IllegalArgumentException e) {
+			throw new ParseException("Invalid timestamp: " + e.getMessage());
 		}
 
 		ValorTimestamp timestamp = new ValorTimestamp(ts);
