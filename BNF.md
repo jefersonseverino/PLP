@@ -16,7 +16,7 @@ Skip ::=
 Atribuicao ::= Id “:=” Expressao
 
 Expressao ::= Valor
-       | ExpUnaria | ExpBinaria | Id | ExpProperty // Acess properties
+       | ExpUnaria | ExpBinaria | Id | ExpProperty
 
 Valor ::= ValorConcreto
 
@@ -27,7 +27,7 @@ ValorConcreto ::= ValorInteiro
        | ValorDuration
 
 ValorTimestamp ::= "@" ValorInteiro "-" ValorInteiro "-" ValorInteiro
-                    "@" ValorInteiro ":" ValorInteiro ":" ValorInteiro [ ValorTimezone ] // 
+                    "@" ValorInteiro ":" ValorInteiro ":" ValorInteiro [ ValorTimezone ] 
 
 ValorDuration ::= ValorInteiro "h" [ ValorInteiro "m" [ ValorInteiro "s" ] ]
 
@@ -44,15 +44,15 @@ ExpBinaria ::= Expressao “+” Expressao
        | Expressao “or” Expressao
        | Expressao “==” Expressao
        | Expressao “++” Expressao
-       | Expressao "<" Expressao // 
-       | Expressao ">" Expressao // 
-       | Expressao "!=" Expressao // 
-       | Expressao ">=" Expressao // 
-       | Expressao "<=" Expressao //
-       | Expressao "*" Expressao // 
-       | Expressao "/" Expressao //
-       | Expressao "in" ValorTimezone // Convert timezone
+       | Expressao "<" Expressao 
+       | Expressao ">" Expressao 
+       | Expressao "!=" Expressao  
+       | Expressao ">=" Expressao  
+       | Expressao "<=" Expressao 
+       | Expressao "*" Expressao  
+       | Expressao "/" Expressao 
        | Expressao "format" Expressao
+       | Expressao "in" ValorTimezone
 
 ExpProperty ::= Expressao "." Id
 
