@@ -684,9 +684,9 @@ Expressao PExpBinaria() :
 			retorno = PExpIN()
 		| LOOKAHEAD (PExpPrimaria() <FORMAT>)
 			retorno = PExpFormat()
-/*
 		|  LOOKAHEAD (PExpPrimaria() <NE>)
 			retorno = PExpNE()
+/*
 		|  LOOKAHEAD (PExpPrimaria() <STAR>)
 			retorno = PExpStar()
 		|  LOOKAHEAD (PExpPrimaria() <SLASH>)
@@ -834,6 +834,18 @@ ExpIN PExpIN() :
 	{return new ExpIN(esq, (ValorTimezone) dir);}
 }
 
+ExpNE PExpNE() : 
+{
+	Expressao esq;
+	Expressao dir;
+}
+{
+	esq = PExpPrimaria()
+	<NE>
+	dir = PExpressao()
+	{return new ExpNE(esq, dir);}
+}
+
 ExpFormat PExpFormat() : 
 {
 	Expressao esq;
@@ -849,19 +861,6 @@ ExpFormat PExpFormat() :
 }
 
 /*
-ExpNE PExpNE() :
-{
-	Expressao esq;
-	Expressao dir;
-}
-{
-	esq = PExpPrimaria()
-	<NE>
-	dir = PExpressao()
-	{return new ExpNE(esq, dir);}
-}
-
-
 
 ExpStar PExpStar() :
 {
@@ -887,17 +886,6 @@ ExpSlash PExpSlash() :
 	{return new ExpSlash(esq, dir);}
 }
 
-ExpIN PExpIN() :
-{
-	Expressao esq;
-	ValorTimezone dir;
-}
-{
-	esq = PExpPrimaria()
-	<IN>
-	dir = PValorTimezone()
-	{return new ExpIN(esq, dir);}
-}
 */
 
 Expressao PExpressao() :
@@ -909,7 +897,7 @@ Expressao PExpressao() :
 	    LOOKAHEAD (2) 
 	  		retorno = PExpUnaria()
 	  | LOOKAHEAD (PExpPrimaria() (<OR> | <AND> | <MINUS> | <PLUS> | <EQ> | <CONCAT> | <LT> 
-	  							   | <GT> | <GE> | <LE> | <NE> | <STAR> | <SLASH> | <IN> | <FORMAT>)) 
+	  							   | <GT> | <GE> | <LE> | <NE> | <STAR> | <SLASH> | <IN> | <FORMAT> | <NE>)) 
 	  		retorno = PExpBinaria()
 	  |
 	    retorno = PExpPrimaria()
