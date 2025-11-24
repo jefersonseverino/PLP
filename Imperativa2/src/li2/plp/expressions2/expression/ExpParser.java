@@ -32,24 +32,28 @@ public class ExpParser extends ExpUnaria {
         Integer minute = Integer.parseInt(timeComponents[1]);
         Integer second = Integer.parseInt(timeComponents[2].substring(0, 2));
 
-        if (timeComponents[2].length() > 2) { // has timezone
-            String timezone = timeComponents[2].substring(2, timeComponents[2].length()).trim();
-            if (timezone.contains("+") || timezone.contains("-")) {
-                String signal = timezone.substring(0, 1);
-                String[] tzComponents = timezone.substring(1).split(":");
-                Integer tzHour = Integer.parseInt(tzComponents[0]);
-                Integer tzMinute = Integer.parseInt(tzComponents[1]);
+        try {
+            if (timeComponents[2].length() > 2) { // has timezone
+                String timezone = timeComponents[2].substring(2, timeComponents[2].length()).trim();
+                if (timezone.contains("+") || timezone.contains("-")) {
+                    String signal = timezone.substring(0, 1);
+                    String[] tzComponents = timezone.substring(1).split(":");
+                    Integer tzHour = Integer.parseInt(tzComponents[0]);
+                    Integer tzMinute = Integer.parseInt(tzComponents[1]);
 
-                TimeStamp ts = new TimeStamp(year, month, day, hour, minute, second, signal, tzHour, tzMinute);
-                return new ValorTimestamp(ts);
-            } else {
-                TimeStamp ts = new TimeStamp(year, month, day, hour, minute, second, timezone);
-                return new ValorTimestamp(ts);
+                    TimeStamp ts = new TimeStamp(year, month, day, hour, minute, second, signal, tzHour, tzMinute);
+                    return new ValorTimestamp(ts);
+                } else {
+                    TimeStamp ts = new TimeStamp(year, month, day, hour, minute, second, timezone);
+                    return new ValorTimestamp(ts);
+                }
             }
-        }
 
-        TimeStamp ts = new TimeStamp(year, month, day, hour, minute, second);
-        return new ValorTimestamp(ts);
+            TimeStamp ts = new TimeStamp(year, month, day, hour, minute, second);
+            return new ValorTimestamp(ts);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Failed to parse timestamp: " + e.getMessage());
+        }
     }
 
     protected boolean checaTipoElementoTerminal(AmbienteCompilacao amb) throws VariavelJaDeclaradaException, 
