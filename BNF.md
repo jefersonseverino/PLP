@@ -16,7 +16,7 @@ Skip ::=
 Atribuicao ::= Id “:=” Expressao
 
 Expressao ::= Valor
-       | ExpUnaria | ExpBinaria | Id | ExpProperty
+       | ExpUnaria | ExpBinaria | Id
 
 Valor ::= ValorConcreto
 
@@ -52,6 +52,7 @@ ExpBinaria ::= Expressao “+” Expressao
        | Expressao "*" Expressao  
        | Expressao "/" Expressao 
        | Expressao "format" Expressao
+       | Expressao "." Expressao
        | Expressao "in" ValorTimezone
 
 ExpProperty ::= Expressao "." Id

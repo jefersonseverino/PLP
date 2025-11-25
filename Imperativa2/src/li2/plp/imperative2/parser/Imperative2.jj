@@ -619,7 +619,6 @@ Expressao PExpParse() :
 Expressao PExpPrimaria() :
 {
     Expressao retorno;
-	Id prop;
 }
 {
 	(  
@@ -627,12 +626,6 @@ Expressao PExpPrimaria() :
 	  | retorno = PValor() 
 	  | <LPAREN> retorno = PExpressao() <RPAREN>
 	)
-	[
-		<DOT> prop = PId()
-        {
-            retorno = new ExpAcessProperty(retorno, prop);
-        }
-	]
 	{
 		return retorno; 
 	}
@@ -690,6 +683,8 @@ Expressao PExpBinaria() :
 			retorno = PExpFormat()
 		|  LOOKAHEAD (PExpPrimaria() <NE>)
 			retorno = PExpNE()
+		| LOOKAHEAD (PExpPrimaria() <DOT>)
+			retorno = PExpProp()
 /*
 		|  LOOKAHEAD (PExpPrimaria() <STAR>)
 			retorno = PExpStar()
@@ -864,6 +859,20 @@ ExpFormat PExpFormat() :
 	}
 }
 
+ExpAcessProperty PExpProp() :
+{
+	Expressao esq;
+	Expressao dir;
+}
+{
+	esq = PExpPrimaria()
+	<DOT>
+	dir = PExpressao()
+	{
+		return new ExpAcessProperty(esq, dir);
+	}
+}
+
 /*
 
 ExpStar PExpStar() :
@@ -901,7 +910,7 @@ Expressao PExpressao() :
 	    LOOKAHEAD (2) 
 	  		retorno = PExpUnaria()
 	  | LOOKAHEAD (PExpPrimaria() (<OR> | <AND> | <MINUS> | <PLUS> | <EQ> | <CONCAT> | <LT> 
-	  							   | <GT> | <GE> | <LE> | <NE> | <STAR> | <SLASH> | <IN> | <FORMAT> | <NE>)) 
+	  							   | <GT> | <GE> | <LE> | <NE> | <STAR> | <SLASH> | <IN> | <FORMAT> | <DOT>)) 
 	  		retorno = PExpBinaria()
 	  |
 	    retorno = PExpPrimaria()

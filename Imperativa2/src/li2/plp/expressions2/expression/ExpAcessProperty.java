@@ -7,10 +7,17 @@ import li2.plp.expressions2.memory.AmbienteExecucao;
 import li2.plp.expressions2.memory.VariavelJaDeclaradaException;
 import li2.plp.expressions2.memory.VariavelNaoDeclaradaException;
 
-public class ExpAcessProperty extends ExpProperty {
+public class ExpAcessProperty extends ExpBinaria {
 
-    public ExpAcessProperty(Expressao expressao, Id propriedade) {
-        super(expressao, propriedade);
+    public ExpAcessProperty(Expressao esq, Expressao dir) {
+        super(esq, dir, ".");
+    }
+
+    public Valor avaliar(AmbienteExecucao amb)
+            throws VariavelNaoDeclaradaException, VariavelJaDeclaradaException {
+        Expressao expressao = getEsq().reduzir(amb);
+        String propName = getDir().toString();
+        return new ValorString(((ValorTimestamp) expressao).acessProperty(propName));
     }
 
     public Tipo getTipo(AmbienteCompilacao amb)
@@ -18,15 +25,25 @@ public class ExpAcessProperty extends ExpProperty {
         return TipoPrimitivo.STRING;
     }
 
-    public Valor avaliar(AmbienteExecucao amb) throws VariavelNaoDeclaradaException, VariavelJaDeclaradaException {
-        expressao = expressao.reduzir(amb);
-        String propName = propriedade.toString();
-        return new ValorString(((ValorTimestamp) expressao).acessProperty(propName));
+    @Override
+    public boolean checaTipo(AmbienteCompilacao amb)
+        throws VariavelJaDeclaradaException {
+        if (!esq.checaTipo(amb)) {
+            return false;
+        }
+        
+        return checaTipoElementoTerminal(amb);
+    }
+
+    @Override
+    protected boolean checaTipoElementoTerminal(AmbienteCompilacao ambiente)
+            throws VariavelNaoDeclaradaException, VariavelJaDeclaradaException {
+        return getEsq().getTipo(ambiente).eTimeStamp();
     }
 
     @Override
     public ExpAcessProperty clone() {
-        return new ExpAcessProperty(getExpressao().clone(), (Id) getPropriedade().clone());
+        return new ExpAcessProperty(this.esq.clone(), this.dir.clone());
     }
 
 }

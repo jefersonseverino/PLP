@@ -11,7 +11,6 @@ import li2.plp.expressions2.memory.VariavelNaoDeclaradaException;
 public abstract class ExpProperty implements Expressao {
     
     Expressao expressao;
-    
     Id propriedade;
 
     /**
