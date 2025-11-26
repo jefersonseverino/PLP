@@ -708,6 +708,10 @@ Expressao PExpBinaria() :
 			retorno = PExpEquals()
 		| LOOKAHEAD (PExpPrimaria() <PLUS>)
 			retorno = PExpSoma()
+		| LOOKAHEAD (PExpPrimaria() <STAR>)
+			retorno = PExpMult()
+		| LOOKAHEAD (PExpPrimaria() <SLASH>)
+			retorno = PExpDiv()
 		|  LOOKAHEAD (PExpPrimaria() <LT>)
 			retorno = PExpLT()
 		|  LOOKAHEAD (PExpPrimaria() <GT>)
@@ -724,13 +728,6 @@ Expressao PExpBinaria() :
 			retorno = PExpNE()
 		| LOOKAHEAD (PExpPrimaria() <DOT>)
 			retorno = PExpProp()
-/*
-		|  LOOKAHEAD (PExpPrimaria() <STAR>)
-			retorno = PExpStar()
-		|  LOOKAHEAD (PExpPrimaria() <SLASH>)
-			retorno = PExpSlash()
-*/
-
 	)
 	{
 		return retorno;
@@ -759,6 +756,30 @@ ExpSub PExpSub() :
 	<MINUS>
 	dir = PExpressao()
 	{return new ExpSub(esq, dir);}
+}
+
+ExpMult PExpMult() :
+{
+	Expressao esq;
+	Expressao dir;
+}
+{
+	esq = PExpPrimaria()
+	<STAR>
+	dir = PExpressao()
+	{return new ExpMult(esq, dir);}
+}
+
+ExpDiv PExpDiv() :
+{
+	Expressao esq;
+	Expressao dir;
+}
+{
+	esq = PExpPrimaria()
+	<SLASH>
+	dir = PExpressao()
+	{return new ExpDiv(esq, dir);}
 }
 
 
@@ -911,34 +932,6 @@ ExpAcessProperty PExpProp() :
 		return new ExpAcessProperty(esq, dir);
 	}
 }
-
-/*
-
-ExpStar PExpStar() :
-{
-	Expressao esq;
-	Expressao dir;
-}
-{
-	esq = PExpPrimaria()
-	<STAR>
-	dir = PExpressao()
-	{return new ExpStar(esq, dir);}
-}
-
-ExpSlash PExpSlash() :
-{
-	Expressao esq;
-	Expressao dir;
-}
-{
-	esq = PExpPrimaria()
-	<SLASH>
-	dir = PExpressao()
-	{return new ExpSlash(esq, dir);}
-}
-
-*/
 
 Expressao PExpressao() :
 {
