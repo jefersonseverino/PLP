@@ -136,6 +136,7 @@ TOKEN : /* TOKENS DE IMPERATIVA 2 */
 | < TIMESTAMP_NUMBER: (["0"-"9"])+ >
 | < PARSE       : "parse" >
 | < FORMAT      : "format" >
+| < NOW 		: "now" >
 }
 
 TOKEN : /* TOKENS DOS POSS�VEIS TIPOS */
@@ -554,6 +555,27 @@ Valor PValorTimezone():
     )
 }
 
+Valor PValorNow():
+{
+}
+{
+    <NOW>
+    {
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+        
+        int year = now.getYear();
+        int month = now.getMonthValue();
+        int day = now.getDayOfMonth();
+        int hour = now.getHour();
+        int min = now.getMinute();
+        int sec = now.getSecond();
+
+        TimeStamp ts = new TimeStamp(year, month, day, hour, min, sec);
+        
+        return new ValorTimestamp(ts);
+    }
+}
+
 Valor PValor() :
 {
 	Valor retorno;
@@ -565,6 +587,7 @@ Valor PValor() :
 		| retorno = PValorString()
 		| retorno = PValorTimeStamp()
 		| retorno = PValorDuration()
+		| retorno = PValorNow()
     )
 	
 	{
