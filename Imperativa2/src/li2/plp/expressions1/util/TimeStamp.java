@@ -40,7 +40,7 @@ public class TimeStamp {
         this.hour = hour;
         this.minute = minute;
         this.second = second;
-        this.tz_str = "UTC";
+        this.tz_str = null; // Sem timezone definido - hora local
     }
 
     public TimeStamp(Integer year, Integer month, Integer day, Integer hour, Integer minute, Integer second, String tz_str) {
@@ -153,6 +153,10 @@ public class TimeStamp {
         return tzMinute != null && tzMinute >= 0 && tzMinute <= 59;
     }
 
+    public boolean hasTimezone() {
+        return tz_str != null;
+    }
+
     public ZoneId getZoneId() {
         if (tz_str != null) {
             return TimezoneRegistry.toZoneId(tz_str);
@@ -162,11 +166,15 @@ public class TimeStamp {
                 tz_signal.equals("+") ? "+" : "-", tz_hour, tz_minute);
             return ZoneId.of(offsetStr);
         }
-        return ZoneId.of("UTC");
+        return null; // Sem timezone definido
     }
 
     public ZonedDateTime toZonedDateTime() {
         ZoneId zone = getZoneId();
+        if (zone == null) {
+            // Timestamp sem timezone - não pode converter para ZonedDateTime
+            throw new RuntimeException("Cannot convert timestamp without timezone to ZonedDateTime");
+        }
         return ZonedDateTime.of(year, month, day, hour, minute, second, 0, zone);
     }
 
@@ -175,6 +183,12 @@ public class TimeStamp {
             throw new RuntimeException("Unsupported timezone: " + targetTimezone);
         }
 
+        // Se o timestamp não tem timezone, apenas atribui o timezone sem mudar a hora
+        if (!hasTimezone()) {
+            return new TimeStamp(year, month, day, hour, minute, second, targetTimezone);
+        }
+
+        // Se tem timezone, converte mantendo o mesmo instante
         ZoneId targetZone = TimezoneRegistry.toZoneId(targetTimezone);
         ZonedDateTime current = toZonedDateTime();
         ZonedDateTime converted = current.withZoneSameInstant(targetZone);

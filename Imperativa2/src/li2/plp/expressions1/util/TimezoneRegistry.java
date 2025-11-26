@@ -41,16 +41,37 @@ public class TimezoneRegistry {
         TIMEZONE_MAP.put("Australia/Brisbane", ZoneId.of("Australia/Brisbane"));
     }
 
+    /**
+     * Normaliza o formato do timezone.
+     * Converte formatos como "UTC+09:00" ou "UTC-03:00" para "+09:00" ou "-03:00"
+     */
+    private static String normalizeTimezone(String timezone) {
+        if (timezone == null) {
+            return null;
+        }
+        // Converte UTC+HH:MM ou UTC-HH:MM para +HH:MM ou -HH:MM
+        if (timezone.matches("UTC[+-]\\d{2}:\\d{2}")) {
+            return timezone.substring(3); 
+        }
+        // Converte GMT+HH:MM ou GMT-HH:MM para +HH:MM ou -HH:MM
+        if (timezone.matches("GMT[+-]\\d{2}:\\d{2}")) {
+            return timezone.substring(3); 
+        }
+        return timezone;
+    }
+
     public static boolean isTimezoneSupported(String timezone) {
         if (timezone == null) {
             return false;
         }
         
-        if (TIMEZONE_MAP.containsKey(timezone)) {
+        String normalized = normalizeTimezone(timezone);
+        
+        if (TIMEZONE_MAP.containsKey(normalized)) {
             return true;
         }
         
-        if (timezone.matches("[+-]\\d{2}:\\d{2}")) {
+        if (normalized.matches("[+-]\\d{2}:\\d{2}")) {
             return true;
         }
         
@@ -62,12 +83,14 @@ public class TimezoneRegistry {
             throw new RuntimeException("Timezone cannot be null");
         }
         
-        if (TIMEZONE_MAP.containsKey(timezone)) {
-            return TIMEZONE_MAP.get(timezone);
+        String normalized = normalizeTimezone(timezone);
+        
+        if (TIMEZONE_MAP.containsKey(normalized)) {
+            return TIMEZONE_MAP.get(normalized);
         }
         
-        if (timezone.matches("[+-]\\d{2}:\\d{2}")) {
-            return ZoneId.of(timezone);
+        if (normalized.matches("[+-]\\d{2}:\\d{2}")) {
+            return ZoneId.of(normalized);
         }
         
         throw new RuntimeException("Unsupported timezone: " + timezone);

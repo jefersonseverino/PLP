@@ -25,7 +25,8 @@ public class ValorTimestamp extends ValorConcreto<TimeStamp> {
         if (valor().tz_signal != null && valor().tz_hour != null && valor().tz_minute != null) {
             return dateTime + " " + valor().tz_signal + String.format("%02d:%02d", valor().tz_hour, valor().tz_minute);
         }
-        return dateTime + " \"UTC\"";
+        
+        return dateTime;
     }
 
     public String acessProperty(String prop) {
@@ -49,7 +50,7 @@ public class ValorTimestamp extends ValorConcreto<TimeStamp> {
                 if (valor().tz_signal != null && valor().tz_hour != null && valor().tz_minute != null) {
                     return valor().tz_signal + String.format("%02d:%02d", valor().tz_hour, valor().tz_minute);
                 }
-                return "UTC";
+                return ""; 
             default:
                 throw new RuntimeException("Invalid property for timestamp: " + prop);
         }
