@@ -133,7 +133,6 @@ TOKEN : /* TOKENS DE IMPERATIVA 2 */
   < PROC: "proc" >
 | < CALL: "call" >
 | < IN: "in" >
-| < TIMESTAMP_NUMBER: (["0"-"9"])+ >
 | < PARSE       : "parse" >
 | < FORMAT      : "format" >
 | < NOW 		: "now" >
@@ -164,6 +163,13 @@ TOKEN : /* LITERALS */
   < #OCTAL_LITERAL: "0" (["0"-"7"])* >
 |
   < DURATION_LITERAL: (<DIGITS> "h") ( <DIGITS> "m" ( <DIGITS> "s" )? )? >
+|
+  < TIMESTAMP_LITERAL: 
+    "@" <DIGITS> "-" <DIGITS> "-" <DIGITS> 
+    "@" <DIGITS> ":" <DIGITS> ":" <DIGITS> 
+  >
+|
+  < TIMEZONE_LITERAL: (["+","-"]) <DIGITS> ":" <DIGITS> >
 |
   < STRING_LITERAL:
       "\""
@@ -441,51 +447,56 @@ Valor PValorString() :
 
 Valor PValorTimeStamp():
 {
-    Token ano;
-    Token mes;
-    Token dia;
-    Token hora;
-    Token minuto;
-    Token segundo;
+    Token tsToken;
+    String str;
+    
+    Integer a = null;
+    Integer m= null;
+    Integer d = null;
+    Integer h = null;
+    Integer min = null;
+    Integer s = null;
 	Token tz_str = null;
     Token tz_sinal = null;
     Token tz_hora = null;
     Token tz_minuto = null;
+
+    java.util.regex.Pattern p = java.util.regex.Pattern.compile("@(\\d+)-(\\d+)-(\\d+)@(\\d+):(\\d+):(\\d+)");
+    java.util.regex.Matcher matcher;
 }
 {
-    "@" 
-    ano = <TIMESTAMP_NUMBER> "-" 
-    mes = <TIMESTAMP_NUMBER> "-" 
-    dia = <TIMESTAMP_NUMBER> 
-    "@" 
-    hora = <TIMESTAMP_NUMBER> ":" 
-    minuto = <TIMESTAMP_NUMBER> ":" 
-    segundo = <TIMESTAMP_NUMBER>
+    tsToken = <TIMESTAMP_LITERAL>
     [
         (
             tz_str = <STRING_LITERAL>
             |
             (tz_sinal = <PLUS> | tz_sinal = <MINUS>)
-            tz_hora = <TIMESTAMP_NUMBER> ":" tz_minuto = <TIMESTAMP_NUMBER>
+            tz_hora = <INTEGER_LITERAL> ":" tz_minuto = <INTEGER_LITERAL>
         )
     ]
-	{
-        int a = Integer.parseInt(ano.toString());
-        int m = Integer.parseInt(mes.toString());
-        int d = Integer.parseInt(dia.toString());
-        int h = Integer.parseInt(hora.toString());
-        int min = Integer.parseInt(minuto.toString());
-        int s = Integer.parseInt(segundo.toString());
-		TimeStamp ts = null;
+    
+    {
+        str = tsToken.image;
+        matcher = p.matcher(str);
 
+        if (matcher.matches()) {
+        	a = Integer.parseInt(matcher.group(1));
+        	m = Integer.parseInt(matcher.group(2));
+        	d = Integer.parseInt(matcher.group(3));
+        	h = Integer.parseInt(matcher.group(4));
+        	min = Integer.parseInt(matcher.group(5));
+        	s = Integer.parseInt(matcher.group(6));
+		}
+
+		TimeStamp ts = null;
 		try {
 			if (tz_str != null) {
-				String timezoneStr = tz_str.toString();
+				String timezoneStr = tz_str.toString().replace("\"", "");
 				ts = new TimeStamp(a, m, d, h, min, s, timezoneStr);
 			} else if (tz_sinal != null) {
 				String timezoneSignal = tz_sinal.toString();
-				int timezoneHour = Integer.parseInt(tz_hora.toString());
-				int timezoneMinute = Integer.parseInt(tz_minuto.toString());
+				int timezoneHour = Integer.parseInt(tz_hora.image); 
+				int timezoneMinute = Integer.parseInt(tz_minuto.image);
 				ts = new TimeStamp(a, m, d, h, min, s, timezoneSignal, timezoneHour, timezoneMinute);
 			} else {
 				ts = new TimeStamp(a, m, d, h, min, s);
@@ -531,10 +542,11 @@ Valor PValorDuration():
 
 Valor PValorTimezone():
 {
-    Token sinal = null;
-    Token horas = null;
-    Token minutos = null;
+    Token tzToken;
     Token texto = null;
+    
+    java.util.regex.Pattern p = java.util.regex.Pattern.compile("([+-])(\\d+):(\\d+)");
+    java.util.regex.Matcher matcher;
 }
 {
     (
@@ -543,14 +555,18 @@ Valor PValorTimezone():
             return new ValorTimezone(texto.image);
         }
     |
-        (sinal = <PLUS> | sinal = <MINUS>)
-        horas = <TIMESTAMP_NUMBER> ":" minutos = <TIMESTAMP_NUMBER>
+        tzToken = <TIMEZONE_LITERAL>
         {
-            int h = Integer.parseInt(horas.image);
-            int m = Integer.parseInt(minutos.image);
-            boolean positivo = sinal.kind == PLUS;
-
-            return new ValorTimezone(positivo, h, m);
+            matcher = p.matcher(tzToken.image);
+            if (matcher.matches()) {
+                String sinalStr = matcher.group(1);
+                int h = Integer.parseInt(matcher.group(2));
+                int m = Integer.parseInt(matcher.group(3));
+                
+                boolean positivo = sinalStr.equals("+");
+                
+                return new ValorTimezone(positivo, h, m);
+            }
         }
     )
 }
@@ -692,6 +708,10 @@ Expressao PExpBinaria() :
 			retorno = PExpEquals()
 		| LOOKAHEAD (PExpPrimaria() <PLUS>)
 			retorno = PExpSoma()
+		| LOOKAHEAD (PExpPrimaria() <STAR>)
+			retorno = PExpMult()
+		| LOOKAHEAD (PExpPrimaria() <SLASH>)
+			retorno = PExpDiv()
 		|  LOOKAHEAD (PExpPrimaria() <LT>)
 			retorno = PExpLT()
 		|  LOOKAHEAD (PExpPrimaria() <GT>)
@@ -708,13 +728,6 @@ Expressao PExpBinaria() :
 			retorno = PExpNE()
 		| LOOKAHEAD (PExpPrimaria() <DOT>)
 			retorno = PExpProp()
-/*
-		|  LOOKAHEAD (PExpPrimaria() <STAR>)
-			retorno = PExpStar()
-		|  LOOKAHEAD (PExpPrimaria() <SLASH>)
-			retorno = PExpSlash()
-*/
-
 	)
 	{
 		return retorno;
@@ -743,6 +756,30 @@ ExpSub PExpSub() :
 	<MINUS>
 	dir = PExpressao()
 	{return new ExpSub(esq, dir);}
+}
+
+ExpMult PExpMult() :
+{
+	Expressao esq;
+	Expressao dir;
+}
+{
+	esq = PExpPrimaria()
+	<STAR>
+	dir = PExpressao()
+	{return new ExpMult(esq, dir);}
+}
+
+ExpDiv PExpDiv() :
+{
+	Expressao esq;
+	Expressao dir;
+}
+{
+	esq = PExpPrimaria()
+	<SLASH>
+	dir = PExpressao()
+	{return new ExpDiv(esq, dir);}
 }
 
 
@@ -895,34 +932,6 @@ ExpAcessProperty PExpProp() :
 		return new ExpAcessProperty(esq, dir);
 	}
 }
-
-/*
-
-ExpStar PExpStar() :
-{
-	Expressao esq;
-	Expressao dir;
-}
-{
-	esq = PExpPrimaria()
-	<STAR>
-	dir = PExpressao()
-	{return new ExpStar(esq, dir);}
-}
-
-ExpSlash PExpSlash() :
-{
-	Expressao esq;
-	Expressao dir;
-}
-{
-	esq = PExpPrimaria()
-	<SLASH>
-	dir = PExpressao()
-	{return new ExpSlash(esq, dir);}
-}
-
-*/
 
 Expressao PExpressao() :
 {
